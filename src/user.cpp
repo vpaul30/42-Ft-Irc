@@ -7,6 +7,7 @@ User::User() {
 	m_is_authorised = false;
 	m_username = "";
 	m_active_channel = "";
+	m_msg_buffer = "";
 }
 
 User::User(int fd, std::string hostname, int port)
@@ -14,6 +15,7 @@ User::User(int fd, std::string hostname, int port)
 	m_is_authorised = false;
 	m_username = "";
 	m_active_channel = "";
+	m_msg_buffer = "";
 }
 
 
@@ -32,6 +34,9 @@ void User::setHostname(std::string &hostname) { m_hostname = hostname; }
 int User::getPort() { return m_port; }
 void User::setPort(int port) { m_port = port; }
 
+std::string User::getMsgBuffer() { return m_msg_buffer; }
+void User::setMsgBuffer(std::string &msg_buffer) { m_msg_buffer = msg_buffer; }
+
 void User::reply(std::string &msg) {
 
 	if (send(m_fd, (void *)&msg, msg.size(), 0) == -1) {
@@ -40,3 +45,12 @@ void User::reply(std::string &msg) {
 		return;
 	}
 }
+
+void User::appendMsgBuffer(std::string &str) {
+	m_msg_buffer += str;
+}
+
+void User::resetMsgBuffer() {
+	m_msg_buffer = "";
+}
+

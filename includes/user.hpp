@@ -15,12 +15,16 @@ class User {
 		// void setAddr(sockaddr_in &addr);
 		// socklen_t *getAddrSize();
 		// void setAddrSize(socklen_t size);
+		std::string getMsgBuffer();
+		void setMsgBuffer(std::string &msg_buffer);
 		std::string getHostname();
 		void setHostname(std::string &hostname);
 		int getPort();
 		void setPort(int port);
 
 		void reply(std::string &msg);
+		void appendMsgBuffer(std::string &str);
+		void resetMsgBuffer();
 
 	private:
 		int m_fd;
@@ -32,5 +36,6 @@ class User {
 		bool m_is_authorised;
 		std::string m_username;
 		std::string m_active_channel;
+		std::string m_msg_buffer;
 
 };

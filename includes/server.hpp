@@ -15,6 +15,7 @@
 #include "channel.hpp"
 #include "user.hpp"
 
+#define RECV_BUFFER_SIZE 1024
 
 class Server {
 	public:
@@ -25,7 +26,7 @@ class Server {
 
 		int acceptUser();
 		void disconnectUser(int fd);
-		std::string readMsg(int fd);
+		int readMsg(int fd);
 		void logMsg(std::string msg);
 	private:
 		// arguments

@@ -41,8 +41,8 @@ int Server::loop() {
 	new_fd.events = POLLIN;
 	m_fds.push_back(new_fd);
 
+	logMsg("Listening...");
 	while (true) {
-		std::cout << "poll\n";
 		poll_res = poll((pollfd *)&m_fds[0], m_fds.size(), -1);
 		for (size_t i = 0; i < m_fds.size(); i++) {
 			if (m_fds[i].revents == POLLIN) {
@@ -54,16 +54,18 @@ int Server::loop() {
 						continue;
 					}
 				} else {
-					std::string msg = readMsg(m_fds[i].fd);
-					if (msg == "") {
+					User &user = m_users[m_fds[i].fd];
+					if (!readMsg(user.getFd())) {
 						continue;
 					}
 					// parse and manage message
-					std::string log_msg = m_users[m_fds[i].fd].getHostname() + ":" + 
-										std::to_string(m_users[m_fds[i].fd].getPort()) + " ";
-					logMsg(log_msg + msg); // temp
-					std::string response = "Me: " + msg;
-					send(m_fds[i].fd, response.c_str(), response.length(), 0);
+					std::string log_msg = user.getHostname() + ":" + 
+										std::to_string(user.getPort()) + " ";
+					logMsg(log_msg + user.getMsgBuffer()); // temp
+					std::string response = "Me: " + user.getMsgBuffer();
+					send(user.getFd(), response.c_str(), response.length(), 0);
+					
+					user.resetMsgBuffer();
 				}
 				continue;
 			}
@@ -120,28 +122,29 @@ void Server::disconnectUser(int fd) {
 	logMsg(msg);
 }
 
-std::string Server::readMsg(int fd) {
-	std::string msg;
-	char buffer[100];
+// returns 0 when '\n' is found
+// returns 1 when '\n' is not found
+// TODO: decide what to do on recv error (disconnect user or simply continue)
+int Server::readMsg(int fd) {
+	char recv_buffer[RECV_BUFFER_SIZE];
 	int bytesRead;
 
-	while (true) {
-		std::memset(buffer, 0, 100);
-		bytesRead = recv(fd, buffer, sizeof(buffer), 0);
-		if (bytesRead < 0) { // EWOULDBLOCK???
-			logMsg("Recv error.");
-			return ""; // return empty string???
-		} else if (bytesRead == 0) { // user disconnected
-			disconnectUser(fd);
-			return "";
-		}
-		msg += buffer;
-		if (msg.find('\n') != std::string::npos) {
-			break;
-		}	
+	std::memset(recv_buffer, 0, RECV_BUFFER_SIZE);
+	bytesRead = recv(fd, recv_buffer, RECV_BUFFER_SIZE, 0);
+	if (bytesRead < 0) { // EWOULDBLOCK???
+		logMsg("Recv error.");
+		return 0;
+	} else if (bytesRead == 0) {
+		disconnectUser(fd);
+		return 0;
 	}
-
-	return msg;
+	std::string msg(recv_buffer);
+	m_users[fd].appendMsgBuffer(msg);
+	logMsg(msg);
+	if (msg.find('\n') != std::string::npos) {
+		return 1;
+	}
+	return 0;
 }
 
 void Server::logMsg(std::string msg) {
@@ -159,7 +162,6 @@ void Server::logMsg(std::string msg) {
 		msg.pop_back();
 	}
 
-    (void)msg;
     std::cout << "\033[0;34m[" << str << "]\033[0m ";
     std::cout << msg << std::endl;
 }
