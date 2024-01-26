@@ -1,12 +1,15 @@
 #include "../includes/server.hpp"
 
+extern bool server_loop;
+
 Server::Server(int port, std::string password) : m_port(port), m_password(password) {}
 
 // creates a listening socket (socket() and bind())
 int Server::setup() {
+	logMsg("Starting server...");
 	m_listening_socket = socket(AF_INET, SOCK_STREAM, 0);
 	if (m_listening_socket == -1) {
-		std::cerr << "Cannot create socket.\n";
+		errorMsg("Cannot create socket.");
 		return -1;
 	}
 
@@ -17,12 +20,12 @@ int Server::setup() {
 	inet_pton(AF_INET, "0.0.0.0", &m_myaddr.sin_addr);
 
 	if (bind(m_listening_socket, (sockaddr *)&m_myaddr, sizeof(m_myaddr)) == -1) {
-		std::cerr << "Cannot bind to ip address.\n";
+		errorMsg("Cannot bind to ip address.");
 		return -1;
 	}
 
 	if (listen(m_listening_socket, 1) == -1) {
-		std::cerr << "Cannot listen.\n";
+		errorMsg("Cannot listen.");
 		return -1;
 	}
 
@@ -42,7 +45,7 @@ int Server::loop() {
 	m_fds.push_back(new_fd);
 
 	logMsg("Listening...");
-	while (true) {
+	while (server_loop) {
 		poll_res = poll((pollfd *)&m_fds[0], m_fds.size(), -1);
 		for (size_t i = 0; i < m_fds.size(); i++) {
 			if (m_fds[i].revents == POLLIN) {
@@ -50,7 +53,7 @@ int Server::loop() {
 				if (m_fds[i].fd == m_listening_socket) {
 					// create client and accept
 					if (acceptUser() == -1) {
-						std::cerr << "Error accepting user.\n";
+						errorMsg("Error accepting user.");
 						continue;
 					}
 				} else {
@@ -82,13 +85,13 @@ int Server::acceptUser() {
 
 	int user_fd = accept(m_listening_socket, (sockaddr *) &addr, &size);
 	if (!user_fd) {
-		std::cerr << "Couldn't accept new user.\n";
+		errorMsg("Couldn't accept new user.");
 		return -1;
 	}
 
 	char hostname_buff[NI_MAXHOST];
 	if (getnameinfo((sockaddr *) &addr, size, hostname_buff, NI_MAXHOST, NULL, 0, NI_NAMEREQD) != 0) {
-		std::cerr << "Couldn't get new user's hostname.\n";
+		errorMsg("Couldn't get new user's hostname.");
 		return -1;
 	}
 
@@ -132,7 +135,7 @@ int Server::readMsg(int fd) {
 	std::memset(recv_buffer, 0, RECV_BUFFER_SIZE);
 	bytesRead = recv(fd, recv_buffer, RECV_BUFFER_SIZE, 0);
 	if (bytesRead < 0) { // EWOULDBLOCK???
-		logMsg("Recv error.");
+		errorMsg("Recv error.");
 		return 0;
 	} else if (bytesRead == 0) {
 		disconnectUser(fd);
@@ -155,13 +158,30 @@ void Server::logMsg(std::string msg) {
     time(&rawtime);
     timeinfo = localtime(&rawtime);
 
-    strftime(buffer, sizeof(buffer), "%d-%m-%Y %H:%M:%S", timeinfo);
+    strftime(buffer, sizeof(buffer), "%d/%m/%Y %H:%M:%S", timeinfo);
     std::string str(buffer);
 
-	if (msg[msg.size() - 1] == '\n') { // temp?
-		msg.pop_back();
-	}
-
     std::cout << "\033[0;34m[" << str << "]\033[0m ";
-    std::cout << msg << std::endl;
+    std::cout << msg;
+	if (msg[msg.size() - 1] != '\n') {
+		std::cout << std::endl;
+	}
 }
+
+ void Server::errorMsg(std::string msg) {
+	time_t      rawtime;
+    struct tm   *timeinfo;
+    char        buffer[80];
+
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+
+    strftime(buffer, sizeof(buffer), "%d/%m/%Y %H:%M:%S", timeinfo);
+    std::string str(buffer);
+
+    std::cerr << "\033[0;31m[" << str << "] ";
+    std::cerr << msg << "\033[0m";
+	if (msg[msg.size() - 1] != '\n') {
+		std::cout << std::endl;
+	}
+ }

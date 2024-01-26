@@ -2,33 +2,41 @@
 #include <string>
 
 #include "../includes/server.hpp"
-#include "../includes/user.hpp"
-#include "../includes/channel.hpp"
+
+bool server_loop = true;
+
+static void signalHandler(int signal) {
+	server_loop = false;
+}
 
 int main(int argc, char **argv) {
 
 	// check arguments (port, password)
 	if (argc != 3) {
-		std::cerr << "You need to pass 2 arguments (port and password).\n";
+		Server::errorMsg("You need to pass 2 arguments (port and password).");
 		return 1;
 	}
 	int port = std::stoi(argv[1]);
 	if (port <= 0 || port > 65535) {
-		std::cerr << "Port should be in range 1-65535.\n";
+		Server::errorMsg("Port should be in range 1-65535.");
 		return 1;
 	}
 	if (argv[2][0] == '\0') {
-		std::cerr << "Password shouldn't be empty.\n";
+		Server::errorMsg("Password shouldn't be empty.");
 		return 1;
 	}
 	// start server
 	Server server(port, argv[2]);
 	if (server.setup() == -1) {
-		std::cerr << "Server setup error.\n";
+		Server::errorMsg("Server setup error.");
 		return 0;
 	}
+
+	signal(SIGINT, signalHandler);
 	server.loop();
-	//
+	
+	std::cout << std::endl;
+	Server::logMsg("Server shutting down...");
 
 	return 0;
 }

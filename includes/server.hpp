@@ -12,6 +12,7 @@
 #include <vector>
 #include <map>
 #include <time.h>
+#include <csignal>
 #include "channel.hpp"
 #include "user.hpp"
 
@@ -21,13 +22,15 @@ class Server {
 	public:
 		Server(int port, std::string password);
 		
+		static void logMsg(std::string msg);
+		static void errorMsg(std::string msg);
+		
 		int setup();
 		int loop();
 
 		int acceptUser();
 		void disconnectUser(int fd);
 		int readMsg(int fd);
-		void logMsg(std::string msg);
 	private:
 		// arguments
 		int m_port;
