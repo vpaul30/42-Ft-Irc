@@ -1,12 +1,13 @@
-#include <iostream>
-#include <string>
-
+// #include <iostream>
+// #include <string>
 #include "../includes/server.hpp"
 
 bool server_loop = true;
 
 static void signalHandler(int signal) {
+	(void)signal;
 	server_loop = false;
+	std::cout << std::endl;
 }
 
 int main(int argc, char **argv) {
@@ -16,7 +17,7 @@ int main(int argc, char **argv) {
 		Server::errorMsg("You need to pass 2 arguments (port and password).");
 		return 1;
 	}
-	int port = std::stoi(argv[1]);
+	int port = atoi(argv[1]);
 	if (port <= 0 || port > 65535) {
 		Server::errorMsg("Port should be in range 1-65535.");
 		return 1;
@@ -35,7 +36,6 @@ int main(int argc, char **argv) {
 	signal(SIGINT, signalHandler);
 	server.loop();
 	
-	std::cout << std::endl;
 	Server::logMsg("Server shutting down...");
 
 	return 0;

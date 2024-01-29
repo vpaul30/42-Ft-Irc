@@ -1,17 +1,20 @@
 CC = c++
 
-CFLAGS = -Wall -Wextra -Werror --std=98
+FLAGS = -Wall -Wextra -Werror -std=c++98
 
 NAME = ircserv
 
-SOURCES = src/main.cpp src/server.cpp src/user.cpp src/channel.cpp  
-
-all: $(NAME)
+SOURCES = src/main.cpp src/server.cpp src/user.cpp src/channel.cpp src/utils.cpp
 
 OBJECTS = $(SOURCES:.cpp=.o)
 
 $(NAME): $(OBJECTS)
 	$(CC) -o $(NAME) $(OBJECTS)
+
+all: $(NAME)
+
+.cpp.o:
+	$(CC) $(FLAGS) -c $< -o $(<:.cpp=.o)
 
 clean:
 	rm -f $(OBJECTS)

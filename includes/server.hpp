@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <cstring>
+#include <cstdlib>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -13,8 +14,10 @@
 #include <map>
 #include <time.h>
 #include <csignal>
+#include <cerrno>
 #include "channel.hpp"
 #include "user.hpp"
+#include "utils.hpp"
 
 #define RECV_BUFFER_SIZE 1024
 
@@ -46,6 +49,6 @@ class Server {
 		std::vector<Channel> m_channels;
 
 		// limits
-		const int max_connections = 5;
+		// const int max_connections;
 
 };

@@ -13,8 +13,15 @@ int Server::setup() {
 		return -1;
 	}
 
+	int optval = 1;
+	if (setsockopt(m_listening_socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval))) {
+		errorMsg("Cannot set socket options.");
+		return -1;
+	}
+
 	const uint16_t port = m_port;
 
+	memset(&m_myaddr, 0, sizeof(m_myaddr));
 	m_myaddr.sin_family = AF_INET;
 	m_myaddr.sin_port = htons(port);
 	inet_pton(AF_INET, "0.0.0.0", &m_myaddr.sin_addr);
@@ -47,6 +54,9 @@ int Server::loop() {
 	logMsg("Listening...");
 	while (server_loop) {
 		poll_res = poll((pollfd *)&m_fds[0], m_fds.size(), -1);
+		if (poll_res < 0 && errno != EINTR) {
+			errorMsg("poll error.");
+		}
 		for (size_t i = 0; i < m_fds.size(); i++) {
 			if (m_fds[i].revents == POLLIN) {
 				// listening socket
@@ -63,7 +73,7 @@ int Server::loop() {
 					}
 					// parse and manage message
 					std::string log_msg = user.getHostname() + ":" + 
-										std::to_string(user.getPort()) + " ";
+										to_string(user.getPort()) + " ";
 					logMsg(log_msg + user.getMsgBuffer()); // temp
 					std::string response = "Me: " + user.getMsgBuffer();
 					send(user.getFd(), response.c_str(), response.length(), 0);
@@ -98,11 +108,15 @@ int Server::acceptUser() {
 	std::string hostname(hostname_buff);
 	User new_user(user_fd, hostname, ntohs(addr.sin_port));
 
-	std::string msg = new_user.getHostname() + ":" + std::to_string(new_user.getPort()) + " connected.";
+	std::string msg = new_user.getHostname() + ":" + to_string(new_user.getPort()) + " connected.";
 	logMsg(msg);
 
-	m_users.insert({user_fd, new_user});
-	m_fds.push_back({user_fd, POLLIN, 0});
+	m_users.insert(std::pair<int, User>(user_fd, new_user));
+	pollfd poll_fd;
+	poll_fd.fd = user_fd;
+	poll_fd.events = POLLIN;
+	poll_fd.revents = 0;
+	m_fds.push_back(poll_fd);
 
 	std::string welcome_msg = "Welcome!\n";
 	send(user_fd, welcome_msg.c_str(), welcome_msg.size(), 0);
@@ -119,7 +133,7 @@ void Server::disconnectUser(int fd) {
 		}
 		it++;
 	}
-	std::string msg = m_users[fd].getHostname() + ":" + std::to_string(m_users[fd].getPort()) + " disconnected.";
+	std::string msg = m_users[fd].getHostname() + ":" + to_string(m_users[fd].getPort()) + " disconnected.";
 	m_users.erase(fd);
 	close(fd);
 	logMsg(msg);
