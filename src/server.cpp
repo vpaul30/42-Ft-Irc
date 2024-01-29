@@ -100,6 +100,11 @@ int Server::acceptUser() {
 		return -1;
 	}
 
+	if (fcntl(user_fd, F_SETFL, O_NONBLOCK) == -1) {
+		errorMsg("fcntl() error.");
+		return -1;
+	}
+
 	char hostname_buff[NI_MAXHOST];
 	if (getnameinfo((sockaddr *) &addr, size, hostname_buff, NI_MAXHOST, NULL, 0, NI_NAMEREQD) != 0) {
 		errorMsg("Couldn't get new user's hostname.");
@@ -149,10 +154,14 @@ int Server::readMsg(int fd) {
 
 	std::memset(recv_buffer, 0, RECV_BUFFER_SIZE);
 	bytesRead = recv(fd, recv_buffer, RECV_BUFFER_SIZE, 0);
-	if (bytesRead < 0) { // EWOULDBLOCK???
+	if (errno == EWOULDBLOCK) {
+		return 0;
+	}
+	if (bytesRead < 0) {
 		errorMsg("Recv error.");
 		return 0;
-	} else if (bytesRead == 0) {
+	}
+	if (bytesRead == 0) {
 		disconnectUser(fd);
 		return 0;
 	}
