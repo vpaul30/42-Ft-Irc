@@ -154,7 +154,7 @@ int Server::readMsg(int fd) {
 
 	std::memset(recv_buffer, 0, RECV_BUFFER_SIZE);
 	bytesRead = recv(fd, recv_buffer, RECV_BUFFER_SIZE, 0);
-	if (errno == EWOULDBLOCK) {
+	if (bytesRead < 0 && errno == EWOULDBLOCK) {
 		return 0;
 	}
 	if (bytesRead < 0) {
