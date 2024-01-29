@@ -2,7 +2,9 @@
 
 extern bool server_loop;
 
-Server::Server(int port, std::string password) : m_port(port), m_password(password) {}
+Server::Server(int port, std::string password) : m_port(port), m_password(password) {
+	m_listening_socket = 0;
+}
 
 // creates a listening socket (socket() and bind())
 int Server::setup() {
@@ -19,14 +21,14 @@ int Server::setup() {
 		return -1;
 	}
 
+	sockaddr_in my_addr;
 	const uint16_t port = m_port;
+	memset(&my_addr, 0, sizeof(my_addr));
+	my_addr.sin_family = AF_INET;
+	my_addr.sin_port = htons(port);
+	inet_pton(AF_INET, "0.0.0.0", &my_addr.sin_addr);
 
-	memset(&m_myaddr, 0, sizeof(m_myaddr));
-	m_myaddr.sin_family = AF_INET;
-	m_myaddr.sin_port = htons(port);
-	inet_pton(AF_INET, "0.0.0.0", &m_myaddr.sin_addr);
-
-	if (bind(m_listening_socket, (sockaddr *)&m_myaddr, sizeof(m_myaddr)) == -1) {
+	if (bind(m_listening_socket, (sockaddr *)&my_addr, sizeof(my_addr)) == -1) {
 		errorMsg("Cannot bind to ip address.");
 		return -1;
 	}
@@ -49,6 +51,7 @@ int Server::loop() {
 
 	new_fd.fd = m_listening_socket;
 	new_fd.events = POLLIN;
+	new_fd.revents = 0;
 	m_fds.push_back(new_fd);
 
 	logMsg("Listening...");
@@ -58,7 +61,7 @@ int Server::loop() {
 			errorMsg("poll error.");
 		}
 		for (size_t i = 0; i < m_fds.size(); i++) {
-			if (m_fds[i].revents == POLLIN) {
+			if (m_fds[i].revents & POLLIN) {
 				// listening socket
 				if (m_fds[i].fd == m_listening_socket) {
 					// create client and accept
@@ -80,12 +83,10 @@ int Server::loop() {
 					
 					user.resetMsgBuffer();
 				}
-				continue;
 			}
 		}
 	}
-
-	close(m_listening_socket);
+	cleanup();
 	return 0;
 }
 
@@ -199,3 +200,11 @@ void Server::logMsg(std::string msg) {
 		std::cout << std::endl;
 	}
  }
+
+void Server::cleanup() {
+	// close all sockets
+	std::vector<pollfd>::iterator it = m_fds.begin();
+	for (; it != m_fds.end(); it++) {
+		close(it->fd);
+	}
+}

@@ -30,6 +30,7 @@ class Server {
 		
 		int setup();
 		int loop();
+		void cleanup();
 
 		int acceptUser();
 		void disconnectUser(int fd);
@@ -41,7 +42,7 @@ class Server {
 
 		// server info
 		int m_listening_socket;
-		sockaddr_in m_myaddr;
+		// sockaddr_in m_myaddr;
 
 		// data
 		std::vector<pollfd> m_fds;
@@ -50,5 +51,4 @@ class Server {
 
 		// limits
 		// const int max_connections;
-
 };
