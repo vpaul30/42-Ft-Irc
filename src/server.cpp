@@ -74,19 +74,27 @@ int Server::loop() {
 					if (!readMsg(user.getFd())) {
 						continue;
 					}
-					// parse and manage message
 					std::string log_msg = user.getHostname() + ":" + 
-										to_string(user.getPort()) + " ";
+										intToString(user.getPort()) + " ";
 					logMsg(log_msg + user.getMsgBuffer()); // temp
-					std::string response = "Me: " + user.getMsgBuffer();
-					send(user.getFd(), response.c_str(), response.length(), 0);
+					// parse and manage message
+
+					processUserMsg(user);
+					// std::string response = "Me: " + user.getMsgBuffer();
+					// send(user.getFd(), response.c_str(), response.length(), 0);
 					
-					user.resetMsgBuffer();
+					// user.resetMsgBuffer();
 				}
 			}
 		}
 	}
 	cleanup();
+	return 0;
+}
+
+int Server::processUserMsg(User &user) {
+	// check if user is authorised
+
 	return 0;
 }
 
@@ -114,7 +122,7 @@ int Server::acceptUser() {
 	std::string hostname(hostname_buff);
 	User new_user(user_fd, hostname, ntohs(addr.sin_port));
 
-	std::string msg = new_user.getHostname() + ":" + to_string(new_user.getPort()) + " connected.";
+	std::string msg = new_user.getHostname() + ":" + intToString(new_user.getPort()) + " connected.";
 	logMsg(msg);
 
 	m_users.insert(std::pair<int, User>(user_fd, new_user));
@@ -139,7 +147,7 @@ void Server::disconnectUser(int fd) {
 		}
 		it++;
 	}
-	std::string msg = m_users[fd].getHostname() + ":" + to_string(m_users[fd].getPort()) + " disconnected.";
+	std::string msg = m_users[fd].getHostname() + ":" + intToString(m_users[fd].getPort()) + " disconnected.";
 	m_users.erase(fd);
 	close(fd);
 	logMsg(msg);
@@ -167,8 +175,8 @@ int Server::readMsg(int fd) {
 	}
 	std::string msg(recv_buffer);
 	m_users[fd].appendMsgBuffer(msg);
-	logMsg(msg);
-	if (msg.find('\n') != std::string::npos) {
+	// logMsg(msg);
+	if (msg.find("\r\n") != std::string::npos) {
 		return 1;
 	}
 	return 0;
@@ -185,11 +193,11 @@ void Server::logMsg(std::string msg) {
     strftime(buffer, sizeof(buffer), "%d/%m/%Y %H:%M:%S", timeinfo);
     std::string str(buffer);
 
-    std::cout << "\033[0;34m[" << str << "]\033[0m ";
-    std::cout << msg;
-	if (msg[msg.size() - 1] != '\n') {
-		std::cout << std::endl;
+	if (msg.find("\r\n") != std::string::npos) {
+		msg.erase(msg.size() - 2, 2);
 	}
+    std::cout << "\033[0;34m[" << str << "]\033[0m ";
+    std::cout << msg << std::endl;
 }
 
  void Server::errorMsg(std::string msg) {

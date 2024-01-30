@@ -33,9 +33,11 @@ class Server {
 		int loop();
 		void cleanup();
 
+		// private???
 		int acceptUser();
 		void disconnectUser(int fd);
 		int readMsg(int fd);
+		int processUserMsg(User &user);
 	private:
 		// arguments
 		int m_port;

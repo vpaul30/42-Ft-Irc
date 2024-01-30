@@ -2,4 +2,4 @@
 #include <string>
 #include <sstream>
 
-std::string to_string(int value);
+std::string intToString(int value);

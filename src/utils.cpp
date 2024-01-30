@@ -1,6 +1,6 @@
 #include "../includes/utils.hpp"
 
-std::string to_string(int value) {
+std::string intToString(int value) {
 	std::ostringstream oss;
 	oss << value;
 	return oss.str();
