@@ -94,8 +94,25 @@ int Server::loop() {
 
 int Server::processUserMsg(User &user) {
 	// check if user is authorised
+	std::string msg = user.getMsgBuffer();
+	MsgInfo msg_info;
+	if (parseMsg(msg, msg_info) == 1) {
+		errorMsg("Parse message error.");
+	}
+	
+	if (user.getIsAuthorised() == false) {
 
+	}
 	return 0;
+}
+
+// prefix -> starts with ':' and ends with first ' ' (space)
+// command -> one word after prefix, can have any amount of spaces before and after
+// parameters -> any amound after command divided by any amount of spaces???
+int Server::parseMsg(std::string &msg, MsgInfo &msg_info) {
+	if (msg[0] == ':') { // prefix
+		
+	}
 }
 
 int Server::acceptUser() {

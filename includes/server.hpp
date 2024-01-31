@@ -22,6 +22,12 @@
 
 #define RECV_BUFFER_SIZE 1024
 
+struct MsgInfo {
+	std::string prefix;
+	std::string cmd;
+	std::string params;
+};
+
 class Server {
 	public:
 		Server(int port, std::string password);
@@ -38,6 +44,7 @@ class Server {
 		void disconnectUser(int fd);
 		int readMsg(int fd);
 		int processUserMsg(User &user);
+		int parseMsg(std::string &msg, MsgInfo &msg_info);
 	private:
 		// arguments
 		int m_port;
