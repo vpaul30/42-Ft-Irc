@@ -93,28 +93,22 @@ int Server::loop() {
 int Server::processUserMsg(User &user) {
 	// split into commands first (as some clients might send more than one command in one message)
 	// execute all cmds
-	
 	std::string &user_msg = user.getMsgBuffer();
 	std::vector<std::string> messages;
 	splitMessages(messages, user_msg);
 
 	for (size_t i = 0; i < messages.size(); i++) {
-		// parse each command and execute
-		// parse message into MsgInfo struct
 		MsgInfo msg_info;
 		parseMsg(messages[i], msg_info);
-		
+		if (user.getIsAuthorised() == false) {
+			// execute only PASS, NICK, USER
+			;
+		} else {
+			;
+			// executeCommand();
+		}
 	}
 
-	// check if user is authorised
-	// MsgInfo msg_info;
-	// if (parseMsg(msg, msg_info) == 1) {
-	// 	errorMsg("Parse message error.");
-	// }
-	
-	if (user.getIsAuthorised() == false) {
-		;
-	}
 	return 0;
 }
 
