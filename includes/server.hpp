@@ -45,6 +45,7 @@ class Server {
 		int readMsg(int fd);
 		int processUserMsg(User &user);
 		int parseMsg(std::string &msg, MsgInfo &msg_info);
+		int splitMessages(std::vector<std::string> &messages, std::string &user_msg);
 	private:
 		// arguments
 		int m_port;

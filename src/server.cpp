@@ -78,11 +78,9 @@ int Server::loop() {
 										intToString(user.getPort()) + " ";
 					logMsg(log_msg + user.getMsgBuffer()); // temp
 					// parse and manage message
-
 					processUserMsg(user);
-					// std::string response = "Me: " + user.getMsgBuffer();
-					// send(user.getFd(), response.c_str(), response.length(), 0);
-					
+
+					std::string response = "Me: " + user.getMsgBuffer();
 					// user.resetMsgBuffer();
 				}
 			}
@@ -93,26 +91,71 @@ int Server::loop() {
 }
 
 int Server::processUserMsg(User &user) {
-	// check if user is authorised
-	std::string msg = user.getMsgBuffer();
-	MsgInfo msg_info;
-	if (parseMsg(msg, msg_info) == 1) {
-		errorMsg("Parse message error.");
+	// split into commands first (as some clients might send more than one command in one message)
+	// execute all cmds
+	
+	std::string &user_msg = user.getMsgBuffer();
+	std::vector<std::string> messages;
+	splitMessages(messages, user_msg);
+
+	for (size_t i = 0; i < messages.size(); i++) {
+		// parse each command and execute
+		// parse message into MsgInfo struct
+		MsgInfo msg_info;
+		parseMsg(messages[i], msg_info);
+		
 	}
+
+	// check if user is authorised
+	// MsgInfo msg_info;
+	// if (parseMsg(msg, msg_info) == 1) {
+	// 	errorMsg("Parse message error.");
+	// }
 	
 	if (user.getIsAuthorised() == false) {
+		;
+	}
+	return 0;
+}
 
+int Server::splitMessages(std::vector<std::string> &messages, std::string &user_msg) {
+	size_t pos = 0;
+	std::string delim = "\r\n";
+	while ((pos = user_msg.find(delim)) != std::string::npos) {
+		messages.push_back(user_msg.substr(0, pos));
+		user_msg.erase(0, pos + delim.size());
 	}
 	return 0;
 }
 
 // prefix -> starts with ':' and ends with first ' ' (space)
 // command -> one word after prefix, can have any amount of spaces before and after
-// parameters -> any amound after command divided by any amount of spaces???
+// parameters -> any amount of words after command divided by any amount of spaces???
 int Server::parseMsg(std::string &msg, MsgInfo &msg_info) {
+	size_t pos;
+	size_t pos2;
+	char delim = ' ';
 	if (msg[0] == ':') { // prefix
-		
+		if ((pos = msg.find(delim)) != std::string::npos) {
+			msg_info.prefix = msg.substr(0, pos);
+			msg.erase(0, pos + 1);
+		}
 	}
+	if ((pos = msg.find_first_not_of(' ')) != std::string::npos) {
+		pos2 = msg.find_first_of(' ', pos);
+		msg_info.cmd = msg.substr(pos, pos2 - pos);
+		msg.erase(0, pos2);
+	}
+	if ((pos = msg.find_first_not_of(' ')) != std::string::npos) {
+		pos2 = msg.find_last_not_of(' ');
+		msg_info.params = msg.substr(pos, pos2 - pos + 1);
+		msg.erase(0, pos2);
+	}
+
+	// std::cout << "prefix = " << msg_info.prefix << ".\n";
+	// std::cout << "cmd = " << msg_info.cmd << ".\n";
+	// std::cout << "params = " << msg_info.params << ".\n";
+	return 0;
 }
 
 int Server::acceptUser() {
@@ -180,6 +223,7 @@ int Server::readMsg(int fd) {
 	std::memset(recv_buffer, 0, RECV_BUFFER_SIZE);
 	bytesRead = recv(fd, recv_buffer, RECV_BUFFER_SIZE, 0);
 	if (bytesRead < 0 && errno == EWOULDBLOCK) {
+		// std::cout << "EWOULDBLOCK\n";
 		return 0;
 	}
 	if (bytesRead < 0) {
