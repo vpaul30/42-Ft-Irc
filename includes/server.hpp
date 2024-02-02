@@ -33,7 +33,7 @@ struct MsgInfo {
 class Server {
 	public:
 		Server(int port, std::string password);
-		
+
 		// mode SERVER -> blue color, mode CLIENT -> green color
 		static void logMsg(std::string msg, int mode);
 		static void errorMsg(std::string msg);
@@ -41,6 +41,8 @@ class Server {
 		int setup();
 		int loop();
 		void cleanup();
+
+		std::map<int, User> &getUsers();
 
 		// private???
 		int acceptUser();
@@ -53,6 +55,7 @@ class Server {
 		// === COMMANDS ===
 		int executeCommand(User &user, MsgInfo &msg_info);
 		int pass(User &user, MsgInfo &msg_info);
+		int nick(User &user, MsgInfo &msg_info);
 	private:
 		// arguments
 		int m_port;

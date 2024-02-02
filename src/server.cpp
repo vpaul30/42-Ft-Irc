@@ -127,7 +127,7 @@ int Server::executeCommand(User &user, MsgInfo &msg_info) {
 	if (msg_info.cmd == "PASS") {
 		pass(user, msg_info);
 	} else if (msg_info.cmd == "NICK") {
-		// nick(user, msg_info);
+		nick(user, msg_info);
 	} else if (msg_info.cmd == "USER") {
 		// user(user, msg_info);
 	} else {
@@ -308,3 +308,5 @@ void Server::cleanup() {
 		close(it->fd);
 	}
 }
+
+std::map<int, User> &Server::getUsers() { return m_users; }
