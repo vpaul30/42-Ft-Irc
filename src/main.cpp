@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
 	signal(SIGINT, signalHandler);
 	server.loop();
 	
-	Server::logMsg("Server shutting down...");
+	Server::logMsg("Server shutting down...", SERVER);
 
 	return 0;
 }

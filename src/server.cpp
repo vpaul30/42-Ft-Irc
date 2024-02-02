@@ -8,7 +8,7 @@ Server::Server(int port, std::string password) : m_port(port), m_password(passwo
 
 // creates a listening socket (socket() and bind())
 int Server::setup() {
-	logMsg("Starting server...");
+	logMsg("Starting server...", SERVER);
 	m_listening_socket = socket(AF_INET, SOCK_STREAM, 0);
 	if (m_listening_socket == -1) {
 		errorMsg("Cannot create socket.");
@@ -54,7 +54,7 @@ int Server::loop() {
 	new_fd.revents = 0;
 	m_fds.push_back(new_fd);
 
-	logMsg("Listening...");
+	logMsg("Listening...", SERVER);
 	while (server_loop) {
 		poll_res = poll((pollfd *)&m_fds[0], m_fds.size(), -1);
 		if (poll_res < 0 && errno != EINTR) {
@@ -76,7 +76,7 @@ int Server::loop() {
 					}
 					std::string log_msg = user.getHostname() + ":" + 
 										intToString(user.getPort()) + " ";
-					logMsg(log_msg + user.getMsgBuffer()); // temp
+					logMsg(log_msg + user.getMsgBuffer(), SERVER); // temp
 					// parse and manage message
 					processUserMsg(user);
 
@@ -102,7 +102,18 @@ int Server::processUserMsg(User &user) {
 		parseMsg(messages[i], msg_info);
 		if (user.getIsAuthorised() == false) {
 			// execute only PASS, NICK, USER
-			;
+			std::string cmd = msg_info.cmd;
+			if (cmd != "PASS" && cmd != "NICK" && cmd != "USER") {
+				continue;
+			}
+			executeCommand(user, msg_info);
+
+			if (!user.getNickname().empty() && !user.getUsername().empty()) {
+				// check data and connect user if pass, nickname and username are valid
+				// if ()
+				// otherwise, send error and disconnect user
+
+			}
 		} else {
 			;
 			// executeCommand();
@@ -111,6 +122,20 @@ int Server::processUserMsg(User &user) {
 
 	return 0;
 }
+
+int Server::executeCommand(User &user, MsgInfo &msg_info) {
+	if (msg_info.cmd == "PASS") {
+		pass(user, msg_info);
+	} else if (msg_info.cmd == "NICK") {
+		// nick(user, msg_info);
+	} else if (msg_info.cmd == "USER") {
+		// user(user, msg_info);
+	} else {
+		// unknown command: ...
+	}
+	return 0;
+}
+
 
 int Server::splitMessages(std::vector<std::string> &messages, std::string &user_msg) {
 	size_t pos = 0;
@@ -145,7 +170,6 @@ int Server::parseMsg(std::string &msg, MsgInfo &msg_info) {
 		msg_info.params = msg.substr(pos, pos2 - pos + 1);
 		msg.erase(0, pos2);
 	}
-
 	// std::cout << "prefix = " << msg_info.prefix << ".\n";
 	// std::cout << "cmd = " << msg_info.cmd << ".\n";
 	// std::cout << "params = " << msg_info.params << ".\n";
@@ -177,7 +201,7 @@ int Server::acceptUser() {
 	User new_user(user_fd, hostname, ntohs(addr.sin_port));
 
 	std::string msg = new_user.getHostname() + ":" + intToString(new_user.getPort()) + " connected.";
-	logMsg(msg);
+	logMsg(msg, SERVER);
 
 	m_users.insert(std::pair<int, User>(user_fd, new_user));
 	pollfd poll_fd;
@@ -204,7 +228,7 @@ void Server::disconnectUser(int fd) {
 	std::string msg = m_users[fd].getHostname() + ":" + intToString(m_users[fd].getPort()) + " disconnected.";
 	m_users.erase(fd);
 	close(fd);
-	logMsg(msg);
+	logMsg(msg, SERVER);
 }
 
 // returns 0 when '\n' is found
@@ -237,7 +261,7 @@ int Server::readMsg(int fd) {
 	return 0;
 }
 
-void Server::logMsg(std::string msg) {
+void Server::logMsg(std::string msg, int mode) {
 	time_t      rawtime;
     struct tm   *timeinfo;
     char        buffer[80];
@@ -251,7 +275,11 @@ void Server::logMsg(std::string msg) {
 	if (msg.find("\r\n") != std::string::npos) {
 		msg.erase(msg.size() - 2, 2);
 	}
-    std::cout << "\033[0;34m[" << str << "]\033[0m ";
+	if (mode == SERVER) {
+    	std::cout << "\033[0;34m[" << str << "]\033[0m ";
+	} else {
+    	std::cout << "\033[0;32m[" << str << "]\033[0m ";
+	}
     std::cout << msg << std::endl;
 }
 

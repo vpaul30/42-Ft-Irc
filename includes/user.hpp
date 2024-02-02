@@ -34,6 +34,9 @@ class User {
 		// m_nickname
 		std::string &getNickname();
 		void setNickname(std::string &nickname);
+		// m_username
+		std::string &getUsername();
+		void setUsername(std::string &username);
 		// m_is_valid_pass
 		bool getIsPassValid();
 		void setIsPassValid(bool value);
@@ -52,8 +55,8 @@ class User {
 
 		bool m_is_authorised;
 		bool m_is_pass_valid;
-		std::string m_username;
 		std::string m_nickname;
+		std::string m_username;
 		std::string m_active_channel;
 		std::string m_msg_buffer;
 

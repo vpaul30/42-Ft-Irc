@@ -21,6 +21,8 @@
 #include "utils.hpp"
 
 #define RECV_BUFFER_SIZE 1024
+#define SERVER 10 // logMsg() to change color between server logs and client replies
+#define CLIENT 11 // logMsg() to change color between server logs and client replies
 
 struct MsgInfo {
 	std::string prefix;
@@ -32,7 +34,8 @@ class Server {
 	public:
 		Server(int port, std::string password);
 		
-		static void logMsg(std::string msg);
+		// mode SERVER -> blue color, mode CLIENT -> green color
+		static void logMsg(std::string msg, int mode);
 		static void errorMsg(std::string msg);
 		
 		int setup();
@@ -46,6 +49,10 @@ class Server {
 		int processUserMsg(User &user);
 		int parseMsg(std::string &msg, MsgInfo &msg_info);
 		int splitMessages(std::vector<std::string> &messages, std::string &user_msg);
+
+		// === COMMANDS ===
+		int executeCommand(User &user, MsgInfo &msg_info);
+		int pass(User &user, MsgInfo &msg_info);
 	private:
 		// arguments
 		int m_port;
