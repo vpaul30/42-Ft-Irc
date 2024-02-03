@@ -8,6 +8,7 @@ User::User() {
 	m_is_pass_valid = false;
 	m_username = "";
 	m_nickname = "";
+	m_realname = "";
 	m_active_channel = "";
 	m_msg_buffer = "";
 }
@@ -18,6 +19,7 @@ User::User(int fd, std::string hostname, int port)
 	m_is_pass_valid = false;
 	m_username = "";
 	m_nickname = "";
+	m_realname = "";
 	m_active_channel = "";
 	m_msg_buffer = "";
 }

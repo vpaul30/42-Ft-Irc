@@ -77,10 +77,8 @@ int Server::loop() {
 					std::string log_msg = user.getHostname() + ":" + 
 										intToString(user.getPort()) + " ";
 					logMsg(log_msg + user.getMsgBuffer(), SERVER); // temp
-					// parse and manage message
-					processUserMsg(user);
+					processUserMsg(user); // parse and manage message
 
-					std::string response = "Me: " + user.getMsgBuffer();
 					// user.resetMsgBuffer();
 				}
 			}
@@ -109,14 +107,24 @@ int Server::processUserMsg(User &user) {
 			executeCommand(user, msg_info);
 
 			if (!user.getNickname().empty() && !user.getUsername().empty()) {
-				// check data and connect user if pass, nickname and username are valid
-				// if ()
-				// otherwise, send error and disconnect user
+				// if pass and username are valid --> send welcome message(001)
+				if (user.getIsPassValid() && validateUsername(user.getUsername())) {
+					user.setIsAuthorised(true);
+					std::string reply = RPL_WELCOME(user.getNickname());
+					send(user.getFd(), reply.c_str(), reply.size(), 0);
+					logMsg(reply, CLIENT);
+				} else { // send error message and disconnect user
+
+				}
+				// std::cout << "nickname: " << user.getNickname() << ".\n";
+				// std::cout << "username: " << user.getUsername() << ".\n";
+				// std::cout << "pass: " << user.getIsPassValid() << ".\n";
 
 			}
 		} else {
 			;
-			// executeCommand();
+			executeCommand(user, msg_info);
+
 		}
 	}
 

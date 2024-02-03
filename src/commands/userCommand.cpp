@@ -1,5 +1,5 @@
 #include "../../includes/server.hpp"
-#include "../../includes/macros.hpp"
+#include "../../includes/replies.hpp"
 
 /*
 	Command: USER

@@ -19,6 +19,8 @@
 #include "channel.hpp"
 #include "user.hpp"
 #include "utils.hpp"
+#include "replies.hpp"
+
 
 #define RECV_BUFFER_SIZE 1024
 #define SERVER 10 // logMsg() to change color between server logs and client replies
