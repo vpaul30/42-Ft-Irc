@@ -19,7 +19,7 @@ static bool validateNickname(std::string &nickname);
 static bool isNicknameAvailable(Server *server, std::string &nickname);
 
 
-int Server::nick(User &user, MsgInfo &msg_info) {
+int Server::nickCommand(User &user, MsgInfo &msg_info) {
 	if (msg_info.params.empty()) {
 		// ERR_NONICKNAMEGIVEN (431)
 		std::string reply = ERR_NONICKNAMEGIVEN(user.getNickname());

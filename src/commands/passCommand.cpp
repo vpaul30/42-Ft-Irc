@@ -14,7 +14,7 @@
 		PASS secretpasswordhere
 */
 
-int Server::pass(User &user, MsgInfo &msg_info) {
+int Server::passCommand(User &user, MsgInfo &msg_info) {
 
 	if (user.getIsAuthorised() == true) {
 		// ERR_ALREADYREGISTERED (462)

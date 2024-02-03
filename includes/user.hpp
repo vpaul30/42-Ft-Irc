@@ -37,6 +37,9 @@ class User {
 		// m_username
 		std::string &getUsername();
 		void setUsername(std::string &username);
+		// m_realname
+		std::string &getRealname();
+		void setRealname(std::string &realname);
 		// m_is_valid_pass
 		bool getIsPassValid();
 		void setIsPassValid(bool value);
@@ -57,6 +60,7 @@ class User {
 		bool m_is_pass_valid;
 		std::string m_nickname;
 		std::string m_username;
+		std::string m_realname;
 		std::string m_active_channel;
 		std::string m_msg_buffer;
 

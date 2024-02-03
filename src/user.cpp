@@ -50,6 +50,9 @@ void User::setNickname(std::string &nickname) { m_nickname = nickname; }
 std::string &User::getUsername() { return m_username; }
 void User::setUsername(std::string &username) { m_username = username; }
 
+std::string &User::getRealname() { return m_realname; }
+void User::setRealname(std::string &realname) { m_realname = realname; }
+
 bool User::getIsPassValid() { return m_is_pass_valid; }
 void User::setIsPassValid(bool value) { m_is_pass_valid = value; }
 

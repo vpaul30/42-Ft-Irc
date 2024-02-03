@@ -5,7 +5,7 @@ FLAGS = -Wall -Wextra -Werror -std=c++98
 NAME = ircserv
 
 SOURCES = src/main.cpp src/server.cpp src/user.cpp src/channel.cpp src/utils.cpp \
-		src/commands/pass.cpp src/commands/nick.cpp
+		src/commands/passCommand.cpp src/commands/nickCommand.cpp src/commands/userCommand.cpp \
 
 OBJECTS = $(SOURCES:.cpp=.o)
 

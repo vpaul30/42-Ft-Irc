@@ -54,8 +54,9 @@ class Server {
 
 		// === COMMANDS ===
 		int executeCommand(User &user, MsgInfo &msg_info);
-		int pass(User &user, MsgInfo &msg_info);
-		int nick(User &user, MsgInfo &msg_info);
+		int passCommand(User &user, MsgInfo &msg_info);
+		int nickCommand(User &user, MsgInfo &msg_info);
+		int userCommand(User &user, MsgInfo &msg_info);
 	private:
 		// arguments
 		int m_port;
