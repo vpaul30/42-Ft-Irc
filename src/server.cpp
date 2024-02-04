@@ -239,8 +239,8 @@ void Server::disconnectUser(int fd) {
 	logMsg(msg, SERVER);
 }
 
-// returns 0 when '\n' is found
-// returns 1 when '\n' is not found
+// returns 0 when '\r\n' is not found
+// returns 1 when '\r\n' is found
 // TODO: decide what to do on recv error (disconnect user or simply continue)
 int Server::readMsg(int fd) {
 	char recv_buffer[RECV_BUFFER_SIZE];

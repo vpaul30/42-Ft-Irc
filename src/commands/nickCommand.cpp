@@ -42,7 +42,6 @@ int Server::nickCommand(User &user, MsgInfo &msg_info) {
 		return 0;
 	}
 	if (user.getIsAuthorised() == true) {
-		std::cout << "user IS authorised.\n";
 		std::string old_nickname = user.getNickname();
 		user.setNickname(msg_info.params);
 		std::string reply = prefix(old_nickname, user.getUsername(), user.getHostname());
@@ -50,7 +49,6 @@ int Server::nickCommand(User &user, MsgInfo &msg_info) {
 		send(user.getFd(), reply.c_str(), reply.size(), 0);
 		logMsg(reply, CLIENT);
 	} else {
-		std::cout << "user IS NOT authorised.\n";
 		user.setNickname(msg_info.params);
 	}
 
