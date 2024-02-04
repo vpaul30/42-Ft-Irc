@@ -59,6 +59,7 @@ int Server::loop() {
 		poll_res = poll((pollfd *)&m_fds[0], m_fds.size(), -1);
 		if (poll_res < 0 && errno != EINTR) {
 			errorMsg("poll error.");
+			break;
 		}
 		for (size_t i = 0; i < m_fds.size(); i++) {
 			if (m_fds[i].revents & POLLIN) {
@@ -82,6 +83,7 @@ int Server::loop() {
 
 					// user.resetMsgBuffer();
 				}
+				break;
 			} else if (m_fds[i].revents & POLLOUT) {
 				std::cout << "pollout\n";
 				User &user = m_users[m_fds[i].fd];
@@ -93,6 +95,7 @@ int Server::loop() {
 					if (rpl_buffer.empty())
 						m_fds[i].events = POLLIN;
 				}
+				break;
 			}
 		}
 	}
@@ -225,9 +228,6 @@ int Server::acceptUser() {
 	poll_fd.events = POLLIN;
 	poll_fd.revents = 0;
 	m_fds.push_back(poll_fd);
-
-	std::string welcome_msg = "Welcome!\n";
-	send(user_fd, welcome_msg.c_str(), welcome_msg.size(), 0);
 
 	return 0;
 }
