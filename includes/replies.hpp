@@ -16,3 +16,7 @@
 
 #define NICK(old_nickname, username, hostname, new_nickname) ("changed nickname to " + new_nickname + "\r\n")
 #define RPL_WELCOME(nickname) (":localhost 001 " + nickname + " :Welcome to the 42 Internet Relay Chat Network " + nickname + ".\r\n")
+#define RPL_YOURHOST(nickname) (":localhost 002 " + nickname + " :Your host is FT_IRC, running version 1.0.\r\n")
+#define RPL_CREATED(nickname, datetime) (":localhost 003 " + nickname + " :This server was created " + datetime + "\r\n")
+#define RPL_MYINFO(nickname) (":localhost 004 " + nickname + " FT_IRC 1.0\r\n")
+#define RPL_ISUPPORT(nickname) (":localhost 005 " + nickname + " MAXTARGETS=1 NICKLEN=12  :are supported by this server\r\n")

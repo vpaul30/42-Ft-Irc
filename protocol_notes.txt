@@ -1,5 +1,0 @@
-+ Each client is distinguished from other clients by a unique
-	nickname having a maximum length of nine (9) characters.
-+ In addition to the nickname, all servers must have the
-	following information about all clients: the real name of the host
-	that the client is running on, the username of the client on that host.

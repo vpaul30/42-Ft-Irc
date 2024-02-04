@@ -63,7 +63,6 @@ int Server::loop() {
 		}
 		for (size_t i = 0; i < m_fds.size(); i++) {
 			if (m_fds[i].revents & POLLIN) {
-				std::cout << "pollin\n";
 				// listening socket
 				if (m_fds[i].fd == m_listening_socket) {
 					// create client and accept
@@ -80,14 +79,11 @@ int Server::loop() {
 										intToString(user.getPort()) + " ";
 					logMsg(log_msg + user.getMsgBuffer(), SERVER); // temp
 					processUserMsg(user); // parse and manage message
-
-					// user.resetMsgBuffer();
 				}
 				break;
 			} else if (m_fds[i].revents & POLLOUT) {
-				std::cout << "pollout\n";
 				User &user = m_users[m_fds[i].fd];
-				if (!user.getRplBuffer().empty()) { // check for "\r\n" ???
+				if (!user.getRplBuffer().empty()) {
 					std::string &rpl_buffer = user.getRplBuffer();
 					size_t bytes_sent = send(user.getFd(), rpl_buffer.c_str(), rpl_buffer.size(), 0);
 					logMsg(rpl_buffer.substr(0, bytes_sent), CLIENT);
