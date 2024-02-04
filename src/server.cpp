@@ -62,6 +62,7 @@ int Server::loop() {
 		}
 		for (size_t i = 0; i < m_fds.size(); i++) {
 			if (m_fds[i].revents & POLLIN) {
+				std::cout << "pollin\n";
 				// listening socket
 				if (m_fds[i].fd == m_listening_socket) {
 					// create client and accept
@@ -80,6 +81,17 @@ int Server::loop() {
 					processUserMsg(user); // parse and manage message
 
 					// user.resetMsgBuffer();
+				}
+			} else if (m_fds[i].revents & POLLOUT) {
+				std::cout << "pollout\n";
+				User &user = m_users[m_fds[i].fd];
+				if (!user.getRplBuffer().empty()) { // check for "\r\n" ???
+					std::string &rpl_buffer = user.getRplBuffer();
+					size_t bytes_sent = send(user.getFd(), rpl_buffer.c_str(), rpl_buffer.size(), 0);
+					logMsg(rpl_buffer.substr(0, bytes_sent), CLIENT);
+					rpl_buffer.erase(0, bytes_sent);
+					if (rpl_buffer.empty())
+						m_fds[i].events = POLLIN;
 				}
 			}
 		}
@@ -111,15 +123,11 @@ int Server::processUserMsg(User &user) {
 				if (user.getIsPassValid() && validateUsername(user.getUsername())) {
 					user.setIsAuthorised(true);
 					std::string reply = RPL_WELCOME(user.getNickname());
-					send(user.getFd(), reply.c_str(), reply.size(), 0);
-					logMsg(reply, CLIENT);
+					user.appendRplBuffer(reply);
+					addPolloutToPollfd(user.getFd());
 				} else { // send error message and disconnect user
 
 				}
-				// std::cout << "nickname: " << user.getNickname() << ".\n";
-				// std::cout << "username: " << user.getUsername() << ".\n";
-				// std::cout << "pass: " << user.getIsPassValid() << ".\n";
-
 			}
 		} else {
 			;
@@ -318,3 +326,11 @@ void Server::cleanup() {
 }
 
 std::map<int, User> &Server::getUsers() { return m_users; }
+
+void Server::addPolloutToPollfd(int user_fd) {
+	std::vector<pollfd>::iterator it = m_fds.begin();
+	for (; it != m_fds.end(); it++) {
+		if (it->fd == user_fd)
+			it->events = POLLIN | POLLOUT;
+	}
+}

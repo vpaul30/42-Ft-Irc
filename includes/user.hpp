@@ -22,6 +22,9 @@ class User {
 		// m_msg_buffer
 		std::string &getMsgBuffer();
 		void setMsgBuffer(std::string &msg_buffer);
+		// m_rpl_buffer
+		std::string &getRplBuffer();
+		void setRplBuffer(std::string &rpl_buffer);
 		// m_hostname
 		std::string &getHostname();
 		void setHostname(std::string &hostname);
@@ -47,6 +50,7 @@ class User {
 		// FUNCTIONS
 		void reply(std::string &msg);
 		void appendMsgBuffer(std::string &str);
+		void appendRplBuffer(std::string &str);
 		void resetMsgBuffer();
 
 	private:
@@ -63,5 +67,6 @@ class User {
 		std::string m_realname;
 		std::string m_active_channel;
 		std::string m_msg_buffer;
+		std::string m_rpl_buffer;
 
 };

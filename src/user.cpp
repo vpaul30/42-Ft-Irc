@@ -11,6 +11,7 @@ User::User() {
 	m_realname = "";
 	m_active_channel = "";
 	m_msg_buffer = "";
+	m_rpl_buffer = "";
 }
 
 User::User(int fd, std::string hostname, int port)
@@ -22,6 +23,7 @@ User::User(int fd, std::string hostname, int port)
 	m_realname = "";
 	m_active_channel = "";
 	m_msg_buffer = "";
+	m_rpl_buffer = "";
 }
 
 
@@ -42,6 +44,9 @@ void User::setPort(int port) { m_port = port; }
 
 std::string &User::getMsgBuffer() { return m_msg_buffer; }
 void User::setMsgBuffer(std::string &msg_buffer) { m_msg_buffer = msg_buffer; }
+
+std::string &User::getRplBuffer() { return m_rpl_buffer; }
+void User::setRplBuffer(std::string &rpl_buffer) { m_rpl_buffer = rpl_buffer; }
 
 bool User::getIsAuthorised() { return m_is_authorised; }
 void User::setIsAuthorised(bool value) { m_is_authorised = value; }
@@ -73,5 +78,9 @@ void User::appendMsgBuffer(std::string &str) {
 
 void User::resetMsgBuffer() {
 	m_msg_buffer = "";
+}
+
+void User::appendRplBuffer(std::string &str) {
+	m_rpl_buffer += str;
 }
 
