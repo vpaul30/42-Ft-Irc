@@ -151,6 +151,8 @@ int Server::executeCommand(User &user, MsgInfo &msg_info) {
 		nickCommand(user, msg_info);
 	} else if (msg_info.cmd == "USER") {
 		userCommand(user, msg_info);
+	} else if (msg_info.cmd == "PRIVMSG") {
+		privmsgCommand(user, msg_info);
 	} else {
 		// unknown command: ...
 	}
@@ -342,4 +344,14 @@ void Server::addPolloutToPollfd(int user_fd) {
 void Server::addRplAndPollout(User &user, std::string &reply) {
 	user.appendRplBuffer(reply);
 	addPolloutToPollfd(user.getFd());
+}
+
+User *Server::getUserByNickname(std::string nickname) {
+	std::map<int, User>::iterator it = m_users.begin();
+	for (; it != m_users.end(); it++) {
+		if (it->second.getNickname() == nickname) {
+			return &(it->second);
+		}
+	}
+	return NULL;
 }

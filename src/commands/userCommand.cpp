@@ -22,22 +22,16 @@ int Server::userCommand(User &user, MsgInfo &msg_info) {
 	if (user.getIsAuthorised() == true) {
 		// ERR_ALREADYREGISTERED (462)
 		std::string reply = ERR_ALREADYREGISTERED(user.getNickname());
-		// user.appendRplBuffer(reply);
-		// addPolloutToPollfd(user.getFd());
 		addRplAndPollout(user, reply);
 
 	} else if (msg_info.params.empty()) {
 		// ERR_NEEDMOREPARAMS (461)
 		std::string reply = ERR_NEEDMOREPARAMS(user.getNickname(), msg_info.cmd);
-		// user.appendRplBuffer(reply);
-		// addPolloutToPollfd(user.getFd());
 		addRplAndPollout(user, reply);
 
 	} else if (validateParams(msg_info.params) == false) {
 		// ERR_NEEDMOREPARAMS (461)
 		std::string reply = ERR_NEEDMOREPARAMS(user.getNickname(), msg_info.cmd);
-		// user.appendRplBuffer(reply);
-		// addPolloutToPollfd(user.getFd());
 		addRplAndPollout(user, reply);
 
 	}

@@ -53,10 +53,11 @@ class Server {
 		int processUserMsg(User &user);
 		int parseMsg(std::string &msg, MsgInfo &msg_info);
 		int splitMessages(std::vector<std::string> &messages, std::string &user_msg);
-		// pollfd &getPollfdByUserFd(int user_fd); // ???
 		void addPolloutToPollfd(int user_fd);
 		void addRplAndPollout(User &user, std::string &reply);
 		std::string &getTimeOfStart();
+
+		User *getUserByNickname(std::string nickname);
 
 		// === COMMANDS ===
 		int executeCommand(User &user, MsgInfo &msg_info);
