@@ -3,10 +3,19 @@
 extern bool server_loop;
 
 Server::Server(int port, std::string password) : m_port(port), m_password(password) {
+	time_t rawtime;
+    tm *timeinfo;
+    char buffer[80];
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+    strftime(buffer, sizeof(buffer), "%d/%m/%Y %H:%M:%S", timeinfo);
+	m_time_of_start = buffer;
+
 	m_listening_socket = 0;
+
 }
 
-// creates a listening socket (socket() and bind())
+// Creates a listening socket on localhost:<port>	
 int Server::setup() {
 	logMsg("Starting server...", SERVER);
 	m_listening_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -41,10 +50,10 @@ int Server::setup() {
 	return 0;
 }
 
-// main server loop, waits for activity on one of fds to do one of the following:
-//	1. accept a new connection
-//	2. communicate with user (authorise on server, create new channel, connect to channel etc.)
-//	3. broadcast user's message to other users of current channel
+// Main loop of the server.
+// With poll() waiting for events on fds (listening_socket and users)
+// On returned POLLIN event either accepts a new connection or reads a message.
+// On returned POLLOUT event sends reply to user and sometimes disconnect that user (e.g. in case of a QUIT command)
 int Server::loop() {
 	int poll_res;
 	pollfd new_fd;
@@ -68,17 +77,15 @@ int Server::loop() {
 					// create client and accept
 					if (acceptUser() == -1) {
 						errorMsg("Error accepting user.");
-						continue;
 					}
 				} else {
 					User &user = m_users[m_fds[i].fd];
-					if (!readMsg(user.getFd())) {
-						continue;
+					if (!readMsg(user.getFd())) { //
+						break;
 					}
-					std::string log_msg = user.getHostname() + ":" + 
-										intToString(user.getPort()) + " ";
-					logMsg(log_msg + user.getMsgBuffer(), SERVER); // temp
-					processUserMsg(user); // parse and manage message
+					std::string log_msg = user.getHostname() + ":" + intToString(user.getPort()) + " ";
+					logMsg(log_msg + user.getMsgBuffer(), SERVER);
+					processUserMsg(user); // parse and manage messag
 				}
 				break;
 			} else if (m_fds[i].revents & POLLOUT) {
@@ -88,6 +95,8 @@ int Server::loop() {
 					size_t bytes_sent = send(user.getFd(), rpl_buffer.c_str(), rpl_buffer.size(), 0);
 					logMsg(rpl_buffer.substr(0, bytes_sent), CLIENT);
 					rpl_buffer.erase(0, bytes_sent);
+					if (user.getMustDisconnect() == true) // after sending the reply check if user must be disconnected
+						disconnectUser(user.getFd());
 					if (rpl_buffer.empty())
 						m_fds[i].events = POLLIN;
 				}
@@ -100,38 +109,35 @@ int Server::loop() {
 }
 
 int Server::processUserMsg(User &user) {
-	// split into commands first (as some clients might send more than one command in one message)
-	// execute all cmds
 	std::string &user_msg = user.getMsgBuffer();
 	std::vector<std::string> messages;
-	splitMessages(messages, user_msg);
+	splitMessages(messages, user_msg); // split message into separate commands (in case there is more than 1)
 
-	for (size_t i = 0; i < messages.size(); i++) {
+	for (size_t i = 0; i < messages.size(); i++) { // parse and execute each command
 		MsgInfo msg_info;
-		parseMsg(messages[i], msg_info);
+		parseMsg(messages[i], msg_info); // parse command into MsgInfo struct
+
+		// if user is not registered server executes only PASS, NICK, USER (mb change later)
 		if (user.getIsAuthorised() == false) {
-			// execute only PASS, NICK, USER
 			std::string cmd = msg_info.cmd;
 			if (cmd != "PASS" && cmd != "NICK" && cmd != "USER") {
 				continue;
 			}
 			executeCommand(user, msg_info);
-
+			// once server has nickname and username it tries to register user
 			if (!user.getNickname().empty() && !user.getUsername().empty()) {
-				// if pass and username are valid --> send welcome message(001)
-				if (user.getIsPassValid() && validateUsername(user.getUsername())) {
+				if (user.getIsPassValid() && validateUsername(user.getUsername())) { // valid registration
 					user.setIsAuthorised(true);
-					std::string reply = RPL_WELCOME(user.getNickname());
-					user.appendRplBuffer(reply);
-					addPolloutToPollfd(user.getFd());
+					std::string reply = registrationMessage(*this, user);
+					addRplAndPollout(user, reply);
 				} else { // send error message and disconnect user
-
+					user.setMustDisconnect(true);
+					std::string reply = ERR_REGISTRATION;
+					addRplAndPollout(user, reply);
 				}
 			}
-		} else {
-			;
+		} else { // if user is registered simply executes any command
 			executeCommand(user, msg_info);
-
 		}
 	}
 
@@ -323,10 +329,17 @@ void Server::cleanup() {
 
 std::map<int, User> &Server::getUsers() { return m_users; }
 
+std::string &Server::getTimeOfStart() { return m_time_of_start; }
+
 void Server::addPolloutToPollfd(int user_fd) {
 	std::vector<pollfd>::iterator it = m_fds.begin();
 	for (; it != m_fds.end(); it++) {
 		if (it->fd == user_fd)
 			it->events = POLLIN | POLLOUT;
 	}
+}
+
+void Server::addRplAndPollout(User &user, std::string &reply) {
+	user.appendRplBuffer(reply);
+	addPolloutToPollfd(user.getFd());
 }

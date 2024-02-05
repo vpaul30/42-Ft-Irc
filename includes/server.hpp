@@ -53,14 +53,17 @@ class Server {
 		int processUserMsg(User &user);
 		int parseMsg(std::string &msg, MsgInfo &msg_info);
 		int splitMessages(std::vector<std::string> &messages, std::string &user_msg);
-		pollfd &getPollfdByUserFd(int user_fd); // ???
+		// pollfd &getPollfdByUserFd(int user_fd); // ???
 		void addPolloutToPollfd(int user_fd);
+		void addRplAndPollout(User &user, std::string &reply);
+		std::string &getTimeOfStart();
 
 		// === COMMANDS ===
 		int executeCommand(User &user, MsgInfo &msg_info);
 		int passCommand(User &user, MsgInfo &msg_info);
 		int nickCommand(User &user, MsgInfo &msg_info);
 		int userCommand(User &user, MsgInfo &msg_info);
+		int privmsgCommand(User &user, MsgInfo &msg_info);
 	private:
 		// arguments
 		int m_port;
@@ -71,6 +74,7 @@ class Server {
 		// sockaddr_in m_myaddr;
 
 		// data
+		std::string m_time_of_start;
 		std::vector<pollfd> m_fds;
 		std::map<int, User> m_users;
 		std::vector<Channel> m_channels;

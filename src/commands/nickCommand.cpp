@@ -23,22 +23,28 @@ int Server::nickCommand(User &user, MsgInfo &msg_info) {
 	if (msg_info.params.empty()) {
 		// ERR_NONICKNAMEGIVEN (431)
 		std::string reply = ERR_NONICKNAMEGIVEN(user.getNickname());
-		user.appendRplBuffer(reply);
-		addPolloutToPollfd(user.getFd());
+		// user.appendRplBuffer(reply);
+		// addPolloutToPollfd(user.getFd());
+		addRplAndPollout(user, reply);
+
 		return 0;
 	}
 	if (validateNickname(msg_info.params) == false) {
 		// ERR_ERRONEUSNICKNAME (432)
 		std::string reply = ERR_ERRONEUSNICKNAME(user.getNickname(), msg_info.params);
-		user.appendRplBuffer(reply);
-		addPolloutToPollfd(user.getFd());
+		// user.appendRplBuffer(reply);
+		// addPolloutToPollfd(user.getFd());
+		addRplAndPollout(user, reply);
+
 		return 0;
 	}
 	if (isNicknameAvailable(this, msg_info.params) == false) {
 		// ERR_NICKNAMEINUSE (433)
 		std::string reply = ERR_NICKNAMEINUSE(user.getNickname(), msg_info.params);
-		user.appendRplBuffer(reply);
-		addPolloutToPollfd(user.getFd());
+		// user.appendRplBuffer(reply);
+		// addPolloutToPollfd(user.getFd());
+		addRplAndPollout(user, reply);
+
 		return 0;
 	}
 	if (user.getIsAuthorised() == true) {
@@ -46,8 +52,10 @@ int Server::nickCommand(User &user, MsgInfo &msg_info) {
 		user.setNickname(msg_info.params);
 		std::string reply = prefix(old_nickname, user.getUsername(), user.getHostname());
 		reply += NICK(old_nickname, user.getUsername(), user.getHostname(), msg_info.params);
-		user.appendRplBuffer(reply);
-		addPolloutToPollfd(user.getFd());
+		// user.appendRplBuffer(reply);
+		// addPolloutToPollfd(user.getFd());
+		addRplAndPollout(user, reply);
+
 	} else {
 		user.setNickname(msg_info.params);
 	}

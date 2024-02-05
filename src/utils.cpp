@@ -13,3 +13,16 @@ bool validateUsername(std::string &username) {
 	}
 	return true;
 }
+
+std::string registrationMessage(Server &server, User &user) {
+	std::string msg;
+	std::string nickname = user.getNickname();
+
+	msg = RPL_WELCOME(nickname);
+	msg += RPL_YOURHOST(nickname);
+	msg += RPL_CREATED(nickname, server.getTimeOfStart());
+	msg += RPL_MYINFO(nickname);
+	msg += RPL_ISUPPORT(nickname);
+	return msg;
+}
+

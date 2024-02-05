@@ -46,12 +46,14 @@ class User {
 		// m_is_valid_pass
 		bool getIsPassValid();
 		void setIsPassValid(bool value);
+		// m_must_disconnect
+		bool getMustDisconnect();
+		void setMustDisconnect(bool value);
 
 		// FUNCTIONS
-		void reply(std::string &msg);
 		void appendMsgBuffer(std::string &str);
 		void appendRplBuffer(std::string &str);
-		void resetMsgBuffer();
+		// void resetMsgBuffer();
 
 	private:
 		int m_fd;
@@ -60,6 +62,7 @@ class User {
 		std::string m_hostname;
 		int m_port;
 
+		bool m_must_disconnect;
 		bool m_is_authorised;
 		bool m_is_pass_valid;
 		std::string m_nickname;

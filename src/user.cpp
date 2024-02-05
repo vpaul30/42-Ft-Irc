@@ -6,6 +6,7 @@ User::User() {
 	m_port = 0;
 	m_is_authorised = false;
 	m_is_pass_valid = false;
+	m_must_disconnect = false;
 	m_username = "";
 	m_nickname = "";
 	m_realname = "";
@@ -18,6 +19,7 @@ User::User(int fd, std::string hostname, int port)
 	: m_fd(fd), m_hostname(hostname), m_port(port) {
 	m_is_authorised = false;
 	m_is_pass_valid = false;
+	m_must_disconnect = false;
 	m_username = "";
 	m_nickname = "";
 	m_realname = "";
@@ -63,22 +65,16 @@ void User::setRealname(std::string &realname) { m_realname = realname; }
 bool User::getIsPassValid() { return m_is_pass_valid; }
 void User::setIsPassValid(bool value) { m_is_pass_valid = value; }
 
-void User::reply(std::string &msg) {
-
-	if (send(m_fd, (void *)&msg, msg.size(), 0) == -1) {
-		// send() error
-		std::cout << "Error sending a message.\n";
-		return;
-	}
-}
+bool User::getMustDisconnect() { return m_must_disconnect; }
+void User::setMustDisconnect(bool value) { m_must_disconnect = value; }
 
 void User::appendMsgBuffer(std::string &str) {
 	m_msg_buffer += str;
 }
 
-void User::resetMsgBuffer() {
-	m_msg_buffer = "";
-}
+// void User::resetMsgBuffer() {
+// 	m_msg_buffer = "";
+// }
 
 void User::appendRplBuffer(std::string &str) {
 	m_rpl_buffer += str;
