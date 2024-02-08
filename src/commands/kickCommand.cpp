@@ -70,18 +70,21 @@ int Server::kickCommand(User &user, MsgInfo &msg_info) {
 		// ERR_NOSUCHCHANNEL (403)
 		std::string reply = ERR_NOSUCHCHANNEL(user.getNickname(), channelName);
 		addRplAndPollout(user, reply);
+		return 0;
 	}
 
 	if (!userInChannel(user, channelName)) {
 		// ERR_NOTONCHANNEL (442)
 		std::string reply = ERR_NOTONCHANNEL(user.getNickname(), channelName);
 		addRplAndPollout(user, reply);
+		return 0;
 	}
 
 	if (!userIsOperator(user, channelName)) {
 		// ERR_CHANOPRIVSNEEDED (482)
 		std::string reply = ERR_CHANOPRIVSNEEDED(user.getNickname(), channelName);
 		addRplAndPollout(user, reply);
+		return 0;
 	}
 
 	size_t spacePos = remainder.find(' ');
@@ -94,9 +97,10 @@ int Server::kickCommand(User &user, MsgInfo &msg_info) {
 			// ERR_NOSUCHNICK (401)
 			std::string reply = ERR_NOSUCHNICK(user.getNickname(), users[i]);
 			addRplAndPollout(user, reply);
+			return 0;
 		}
 
-		if (!nickInChannel(users[i], channelName)) {
+		if (nickInChannel(users[i], channelName)) {
 			// ERR_USERNOTINCHANNEL (441)
 			std::string reply = ERR_USERNOTINCHANNEL(user.getNickname(), users[i], channelName);
 			addRplAndPollout(user, reply);

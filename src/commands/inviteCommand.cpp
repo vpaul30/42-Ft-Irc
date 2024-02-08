@@ -43,15 +43,16 @@ bool Server::nickNotExistent(const std::string& nickname) {
 	return true;
 }
 
-bool Server::nickInChannel(const User& nick, const std::string& channel) {
+//check again: user1 joins channel, user2 joins same channel -> user1 invites user2 to the already joined channel -> shouldn't work
+bool Server::nickInChannel(const std::string& nick, const std::string& channel) {
 	const std::vector<User>& users = m_channels[channel].getUsers();
 	for (size_t i = 0; i < users.size(); ++i) {
-		if (users[i].getNickname() == nick.getNickname())
+		if (users[i].getNickname() == nick)
 			return true;
 	}
 	const std::vector<User>& operators = m_channels[channel].getOperators();
 	for (size_t i = 0; i < operators.size(); ++i) {
-		if (operators[i].getNickname() == nick.getNickname())
+		if (operators[i].getNickname() == nick)
 			return true;
 	}
 	return false;
@@ -78,8 +79,8 @@ int Server::inviteCommand(User &user, MsgInfo &msg_info) {
 	}
 
 	if (!userInChannel(user, channelName)) {
-		// ERR_USERONCHANNEL (443)
-		std::string reply = ERR_USERONCHANNEL(user.getNickname(), nickname, channelName);
+		// ERR_NOTONCHANNEL (442)
+		std::string reply = ERR_NOTONCHANNEL(user.getNickname(), channelName);
 		addRplAndPollout(user, reply);
 		return 0;
 	}
@@ -98,9 +99,9 @@ int Server::inviteCommand(User &user, MsgInfo &msg_info) {
 		return 0;
 	}
 
-	if (!nickInChannel(user, channelName)) {
-		// ERR_NOTONCHANNEL (442)
-		std::string reply = ERR_NOTONCHANNEL(user.getNickname(), channelName);
+	if (!nickInChannel(nickname, channelName)) {
+		// ERR_USERONCHANNEL (443)
+		std::string reply = ERR_USERONCHANNEL(user.getNickname(), nickname, channelName);
 		addRplAndPollout(user, reply);
 		return 0;
 	}
