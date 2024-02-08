@@ -78,7 +78,7 @@ class Server {
 		bool userInChannel(const User& user, const std::string& channel);
 		bool userIsOperator(const User& user, const std::string& channel);
 		bool nickNotExistent(const std::string& nickname);
-		bool nickInChannel(const User& nick, const std::string &channel);
+		bool nickInChannel(const std::string& nick, const std::string &channel);
 
 	private:
 		// arguments

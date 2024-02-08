@@ -45,6 +45,11 @@ bool Server::userInChannel(const User& user, const std::string& channel) {
 	if (m_channels.find(channel) == m_channels.end())
 		return false;
 	Channel& channelObj = m_channels[channel];
+	const std::vector<User>& users = channelObj.getUsers();
+	for (size_t i = 0; i < users.size(); ++i) {
+		if (users[i].getNickname() == user.getNickname())
+			return true;
+	}
 	const std::vector<User>& operators = channelObj.getOperators();
 	for (size_t i = 0; i < operators.size(); ++i) {
 		if (operators[i].getNickname() == user.getNickname())
