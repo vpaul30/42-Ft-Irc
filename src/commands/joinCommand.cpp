@@ -42,22 +42,34 @@ int Server::joinCommand(User &user, MsgInfo &msg_info) {
 	getChannelNames(channel_names, msg_info.params);
 	std::vector<std::string> channel_keys;
 	getChannelKeys(channel_keys, msg_info.params);
-	
+
+	std::string channel_name;
 	for (int i = 0; i < channel_names.size(); i++) {
-		if (isChannelNameValid(channel_names[i]) == false) {
+		channel_name = channel_names[i];
+		if (isChannelNameValid(channel_name) == false) {
 			// ERR_NOSUCHCHANNEL (403)
-			std::string reply = ERR_NOSUCHCHANNEL(user.getNickname(), channel_names[i]);
+			std::string reply = ERR_NOSUCHCHANNEL(user.getNickname(), channel_name);
 			addRplAndPollout(user, reply);
-		} else if (checkChannelExist(this, channel_names[i]) == true) {
-			// channel exists, try to join
-			std::cout << "trying to join " << channel_names[i] << std::endl;
-		} else {
-			// channel doesnt exist, create a new one
-			std::cout << "creating " << channel_names[i] << std::endl;
-			Channel new_channel(channel_names[i], user);
-			m_channels.insert(std::pair<std::string, Channel>(channel_names[i], new_channel));
+		} else if (checkChannelExist(this, channel_name) == true) { // channel exists, try to join
+			std::cout << "trying to join " << channel_name << std::endl;
+			// if server has no password
+			// if server is not in invite only mode
+			// is server is not full (in case of user limit)
+			// join the channel
+			Channel &channel_to_join = m_channels[channel_name];
+			channel_to_join.addNewUser(user);
 			std::string reply = prefix(user.getNickname(), user.getUsername(), user.getHostname());
-			reply += JOIN(channel_names[i]);
+			reply += JOIN(channel_name);
+			addRplAndPollout(user, reply);
+			// broadcast reply to everyone else
+			channel_to_join.broadcastMsg(this, user, reply);
+			std::cout << "join try complete\n";
+		} else { // channel doesn't exist, create a new one
+			std::cout << "creating " << channel_name << std::endl;
+			Channel new_channel(channel_name, user);
+			m_channels.insert(std::pair<std::string, Channel>(channel_name, new_channel));
+			std::string reply = prefix(user.getNickname(), user.getUsername(), user.getHostname());
+			reply += JOIN(channel_name);
 			addRplAndPollout(user, reply);
 		}
 	}

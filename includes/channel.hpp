@@ -7,11 +7,14 @@
 #include "server.hpp"
 #include "user.hpp"
 
+class Server;
 class User;
 
 class Channel {
 	public:
-		Channel() {};
+
+		Channel();
+
 		Channel(std::string channel_name, User &user);
 
 		// GETTERS & SETTERS
@@ -30,6 +33,10 @@ class Channel {
 		// m_pasword
 		std::string &getPassword();
 		void setPassword(std::string &password);
+
+
+		void addNewUser(User &user);
+		void broadcastMsg(Server *server, User &user_to_ignore, std::string msg);
 
 	private:
 		std::string m_channel_name;

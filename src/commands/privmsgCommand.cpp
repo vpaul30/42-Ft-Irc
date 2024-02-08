@@ -30,6 +30,7 @@ static bool hasOneWord(std::string &params);
 static std::string getTarget(std::string &params);
 static bool checkTargetExist(Server *server, std::string &params);
 static std::string getMessageText(std::string &params);
+static bool checkUserInChannel(Server *server, User &user, std::string &channel_name);
 
 
 int Server::privmsgCommand(User &user, MsgInfo &msg_info) {
@@ -37,19 +38,36 @@ int Server::privmsgCommand(User &user, MsgInfo &msg_info) {
 		// ERR_NORECIPIENT (411)
 		std::string reply = ERR_NORECIPIENT(user.getNickname());
 		addRplAndPollout(user, reply);
+		return 0;
 	}
-	else if (hasOneWord(msg_info.params) == true) { // only target, no text
+	if (hasOneWord(msg_info.params) == true) { // only target, no text
 		// ERR_NOTEXTTOSEND (412)
 		std::string reply = ERR_NOTEXTTOSEND(user.getNickname());
 		addRplAndPollout(user, reply);
+		return 0;
 	} 
-	else if (checkTargetExist(this, msg_info.params) == false) {
+	if (checkTargetExist(this, msg_info.params) == false) {
 		// ERR_NOSUCHNICK (401)
 		std::string target = getTarget(msg_info.params);
 		std::string reply = ERR_NOSUCHNICK(user.getNickname(), target);
 		addRplAndPollout(user, reply);
-	} else {
-		std::string target = getTarget(msg_info.params);
+		return 0;
+	}
+	std::string target = getTarget(msg_info.params);
+	if (target[0] == '#') { // target is a channel
+		// check if user belongs to channel
+		if (checkUserInChannel(this, user, target) == false) {
+			// ERR_CANNOTSENDTOCHAN (404)
+			std::string reply = ERR_CANNOTSENDTOCHAN(user.getNickname(), target);
+			addRplAndPollout(user, reply);
+			return 0;
+		}
+		// broadcast the message
+		Channel &channel_to_join = m_channels[target];
+		std::string reply = prefix(user.getNickname(), user.getUsername(), user.getHostname());
+		reply += PRIVMSG(target, getMessageText(msg_info.params));
+		channel_to_join.broadcastMsg(this, user, reply);
+	} else { // target is another user
 		std::string reply = prefix(user.getNickname(), user.getUsername(), user.getHostname());
 		reply += PRIVMSG(target, getMessageText(msg_info.params));
 		User *target_user = getUserByNickname(target);
@@ -115,4 +133,21 @@ static std::string getMessageText(std::string &params) {
 			text = copy;
 	}
 	return text;
+}
+
+static bool checkUserInChannel(Server *server, User &user, std::string &channel_name) {
+	std::map<std::string, Channel> &channels = server->getChannels();
+	Channel &channel = channels[channel_name];
+
+	std::vector<User> users = channel.getUsers();
+	for (int i = 0; i < users.size(); i++) {
+		if (user.getNickname() == users[i].getNickname())
+			return true;
+	}
+	std::vector<User> operators = channel.getOperators();
+	for (int i = 0; i < operators.size(); i++) {
+		if (user.getNickname() == operators[i].getNickname())
+			return true;
+	}
+	return false;
 }
