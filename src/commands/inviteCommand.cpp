@@ -49,6 +49,11 @@ bool Server::nickInChannel(const User& nick, const std::string& channel) {
 		if (users[i].getNickname() == nick.getNickname())
 			return true;
 	}
+	const std::vector<User>& operators = m_channels[channel].getOperators();
+	for (size_t i = 0; i < operators.size(); ++i) {
+		if (operators[i].getNickname() == nick.getNickname())
+			return true;
+	}
 	return false;
 }
 
