@@ -153,7 +153,10 @@ int Server::executeCommand(User &user, MsgInfo &msg_info) {
 		userCommand(user, msg_info);
 	} else if (msg_info.cmd == "PRIVMSG") {
 		privmsgCommand(user, msg_info);
-	} else {
+	} else if (msg_info.cmd == "JOIN") {
+		joinCommand(user, msg_info);
+	}
+	else {
 		// unknown command: ...
 	}
 	return 0;
@@ -274,7 +277,7 @@ int Server::readMsg(int fd) {
 	}
 	std::string msg(recv_buffer);
 	m_users[fd].appendMsgBuffer(msg);
-	// logMsg(msg);
+	// logMsg(msg, SERVER);
 	if (msg.find("\r\n") != std::string::npos) {
 		return 1;
 	}
@@ -355,3 +358,5 @@ User *Server::getUserByNickname(std::string nickname) {
 	}
 	return NULL;
 }
+
+std::map<std::string, Channel> &Server::getChannels() { return m_channels; }

@@ -58,6 +58,7 @@ class Server {
 		std::string &getTimeOfStart();
 
 		User *getUserByNickname(std::string nickname);
+		std::map<std::string, Channel> &getChannels();
 
 		// === COMMANDS ===
 		int executeCommand(User &user, MsgInfo &msg_info);
@@ -65,6 +66,8 @@ class Server {
 		int nickCommand(User &user, MsgInfo &msg_info);
 		int userCommand(User &user, MsgInfo &msg_info);
 		int privmsgCommand(User &user, MsgInfo &msg_info);
+		int joinCommand(User &user, MsgInfo &msg_info);
+
 	private:
 		// arguments
 		int m_port;
@@ -78,7 +81,7 @@ class Server {
 		std::string m_time_of_start;
 		std::vector<pollfd> m_fds;
 		std::map<int, User> m_users;
-		std::vector<Channel> m_channels;
+		std::map<std::string, Channel> m_channels;
 
 		// limits
 		// const int max_connections;

@@ -9,10 +9,10 @@ class Channel {
 
 
 	private:
-		std::string channelName;
-		bool hasPassword;
-		std::string password;
-		std::vector<std::string> users;
-		std::vector<std::string> operators;
+		std::string m_channel_name;
+		std::string m_password;
+		std::string m_topic;
+		std::vector<std::string> m_users;
+		std::vector<std::string> m_operators;
 
 };

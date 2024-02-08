@@ -1,12 +1,13 @@
 CC = c++
 
-FLAGS = -Wall -Wextra -Werror -std=c++98
+# FLAGS = -Wall -Wextra -Werror -std=c++98
+FLAGS = -std=c++98
 
 NAME = ircserv
 
 SOURCES = src/main.cpp src/server.cpp src/user.cpp src/channel.cpp src/utils.cpp \
 		src/commands/passCommand.cpp src/commands/nickCommand.cpp src/commands/userCommand.cpp \
-		src/commands/privmsgCommand.cpp
+		src/commands/privmsgCommand.cpp src/commands/joinCommand.cpp
 
 OBJECTS = $(SOURCES:.cpp=.o)
 
