@@ -22,7 +22,6 @@
 		TOPIC #test                     ; Checking the topic for "#test"
 */
 
-// implement functions for: channelExists, userInChannel, userIsOperator, topicIsSet
 // invite only channels?
 // implement channel.getcurrenttopic, channel.topicsetter, channel.timeoftopic
 
@@ -36,6 +35,37 @@ static std::pair<std::string, std::string> paramSplit(const std::string& params)
 	} else {
 		return std::make_pair(params, "");
 	}
+}
+
+static bool channelExists(const std::string& channel) {
+	return m_channels.find(channel) != m_channels.end();
+}
+
+static bool userInChannel(const User& user, const std::string& channel) {
+	if (m_channels.find(channel) == m_channels.end())
+		return false;
+	Channel& channel = m_channels[channel];
+	const std::vector<User>& users = channel.getUsers();
+	for (size_t i = 0; i < users.size(); ++i) {
+		if (users[i].nickname == user.nickname)
+			return true;
+	}
+	return false;
+}
+
+static bool userIsOperator(const User& user, const std::string& channel) {
+	if (m_channels.find(channel) == m_channels.end())
+		return false;
+	Channel& channel = m_channels[channel];
+	if (!channel.getUsers().empty() && channel.getUsers()[0].nickname == user.nickname)
+		return true;
+	return false;
+}
+
+static bool topicIsSet(const std::string& channel){
+	if (m_channels.find(channel) == m_channels.end())
+		return false;
+	return !m_channels[channel].topic.empty();
 }
 
 int Server::topicCommand(User &user, MsgInfo &msg_info) {
