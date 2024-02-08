@@ -26,6 +26,7 @@
 */
 
 static void getChannelNames(std::vector<std::string> &channel_names, std::string &params);
+static void getChannelKeys(std::vector<std::string> &channel_keys, std::string &params);
 static bool isChannelNameValid(std::string &channel_name);
 static bool checkChannelExist(Server *server, std::string &channel_name);
 
@@ -38,20 +39,36 @@ int Server::joinCommand(User &user, MsgInfo &msg_info) {
 	}
 
 	// test
-	Channel new_channel;
-	m_channels.insert(std::pair<std::string, Channel>("#test1", new_channel));
+	// Channel new_channel;
+	// m_channels.insert(std::pair<std::string, Channel>("#test1", new_channel));
 
 	std::vector<std::string> channel_names;
 	getChannelNames(channel_names, msg_info.params);
+	std::vector<std::string> channel_keys;
+	getChannelKeys(channel_keys, msg_info.params);
+	
+	//test
+	// for (int i = 0; i < channel_names.size(); i++)
+	// 	std::cout << "channel " << i << ": " << channel_names[i] << std::endl;
+	// for (int i = 0; i < channel_keys.size(); i++)
+	// 	std::cout << "key " << i << ": " << channel_keys[i] << std::endl;
+
 	for (int i = 0; i < channel_names.size(); i++) {
 		if (isChannelNameValid(channel_names[i]) == false) {
 			// ERR_NOSUCHCHANNEL (403)
+			std::string reply = ERR_NOSUCHCHANNEL(user.getNickname(), channel_names[i]);
+			addRplAndPollout(user, reply);
 		} else if (checkChannelExist(this, channel_names[i]) == true) {
 			// channel exists, try to join
 			std::cout << "trying to join " << channel_names[i] << std::endl;
 		} else {
 			// channel doesnt exist, create a new one
 			std::cout << "creating " << channel_names[i] << std::endl;
+			Channel new_channel(channel_names[i], user);
+			m_channels.insert(std::pair<std::string, Channel>(channel_names[i], new_channel));
+			std::string reply = prefix(user.getNickname(), user.getUsername(), user.getHostname());
+			reply += JOIN(channel_names[i]);
+			addRplAndPollout(user, reply);
 		}
 	}
 
@@ -60,8 +77,9 @@ int Server::joinCommand(User &user, MsgInfo &msg_info) {
 
 static void getChannelNames(std::vector<std::string> &channel_names, std::string &params) {
 	std::string copy = params;
-	size_t pos;
 	std::string word;
+	size_t pos;
+
 	while (true) {
 		pos = copy.find_first_of(" ,");
 		if (pos == std::string::npos) { // only 1 word in copy --> push it and break
@@ -77,6 +95,35 @@ static void getChannelNames(std::vector<std::string> &channel_names, std::string
 			word = copy.substr(0, pos);
 			if (!word.empty())
 				channel_names.push_back(word); // ',' means there are more channel_names after it --> push it and erase
+			copy.erase(0, pos + 1);
+		}
+	}
+}
+
+static void getChannelKeys(std::vector<std::string> &channel_keys, std::string &params) {
+	std::string copy = params;
+	std::string word;
+	size_t pos;
+
+	if ((pos = copy.find(' ')) == std::string::npos) // no ' ' in params means there are no keys
+		return;
+	copy.erase(0, pos + 1); // erase everything until ' ' included
+
+	while(true) {
+		pos = copy.find_first_of(" ,");
+		if (pos == std::string::npos) { // only 1 word in copy --> push it and break
+			if (!copy.empty())
+				channel_keys.push_back(copy);
+			break;
+		} else if (copy[pos] == ' ') { // ' ' means there are no more channel_keys after it --> push it and break
+			word = copy.substr(0, pos);
+			if (!word.empty())
+				channel_keys.push_back(word);
+			break;
+		} else { // ','
+			word = copy.substr(0, pos);
+			if (!word.empty())
+				channel_keys.push_back(word); // ',' means there are more channel_keys after it --> push it and erase
 			copy.erase(0, pos + 1);
 		}
 	}

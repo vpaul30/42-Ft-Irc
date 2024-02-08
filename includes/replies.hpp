@@ -33,9 +33,10 @@
 #define RPL_ISUPPORT(nickname) (":localhost 005 " + nickname + " MAXTARGETS=1 NICKLEN=12  :are supported by this server\r\n")
 
 #define RPL_NOTOPIC(nickname, channel) (":localhost 331 " + nickname + " " + channel + " :No topic is set")
-#define RPL_TOPIC(nickname, //channel, //topic) (":localhost 332 " + nickname + " " + channel + " :" + topic)
-#define RPL_TOPICWHOTIME(nickname, //channel, //who, //time) (":localhost 333 " + nickname + " " + channel + " " + who + " " + time)
+// #define RPL_TOPIC(nickname, //channel, //topic) (":localhost 332 " + nickname + " " + channel + " :" + topic)
+// #define RPL_TOPICWHOTIME(nickname, //channel, //who, //time) (":localhost 333 " + nickname + " " + channel + " " + who + " " + time)
 #define RPL_INVITING(nickname, who, channel) (":localhost 341 " + nickname + " " + who + " " + channel)
 
 #define NICK(old_nickname, username, hostname, new_nickname) ("changed nickname to " + new_nickname + "\r\n")
 #define PRIVMSG(target_nickname, message) ("PRIVMSG " + target_nickname + " :" + message + "\r\n");
+#define JOIN(channel) ("JOIN " + channel + "\r\n")

@@ -32,6 +32,8 @@ struct MsgInfo {
 	std::string params;
 };
 
+class Channel;
+
 class Server {
 	public:
 		Server(int port, std::string password);
