@@ -38,21 +38,11 @@ int Server::joinCommand(User &user, MsgInfo &msg_info) {
 		return 0;
 	}
 
-	// test
-	// Channel new_channel;
-	// m_channels.insert(std::pair<std::string, Channel>("#test1", new_channel));
-
 	std::vector<std::string> channel_names;
 	getChannelNames(channel_names, msg_info.params);
 	std::vector<std::string> channel_keys;
 	getChannelKeys(channel_keys, msg_info.params);
 	
-	//test
-	// for (int i = 0; i < channel_names.size(); i++)
-	// 	std::cout << "channel " << i << ": " << channel_names[i] << std::endl;
-	// for (int i = 0; i < channel_keys.size(); i++)
-	// 	std::cout << "key " << i << ": " << channel_keys[i] << std::endl;
-
 	for (int i = 0; i < channel_names.size(); i++) {
 		if (isChannelNameValid(channel_names[i]) == false) {
 			// ERR_NOSUCHCHANNEL (403)

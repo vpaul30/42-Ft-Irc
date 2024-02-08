@@ -53,7 +53,10 @@ int Server::privmsgCommand(User &user, MsgInfo &msg_info) {
 		std::string reply = prefix(user.getNickname(), user.getUsername(), user.getHostname());
 		reply += PRIVMSG(target, getMessageText(msg_info.params));
 		User *target_user = getUserByNickname(target);
-		// if (target_user == NULL) error
+		if (target_user == NULL) {
+			errorMsg("getUserByNickname() error.");
+			return 1;
+		}
 		addRplAndPollout(*target_user, reply);
 	}
 	return 0;
@@ -72,14 +75,23 @@ static std::string getTarget(std::string &params) {
 }
 
 static bool checkTargetExist(Server *server, std::string &params) {
-	std::map<int, User> &users = server->getUsers();
-	std::map<int, User>::iterator it = users.begin();
 	std::string target = getTarget(params);
 
-	for (; it != users.end(); it++) {
-		if (it->second.getNickname() == target)
+	// check users
+	std::map<int, User> &users = server->getUsers();
+	std::map<int, User>::iterator users_it = users.begin();
+	for (; users_it != users.end(); users_it++) {
+		if (users_it->second.getNickname() == target)
 			return true;
 	}
+	//check channels
+	std::map<std::string, Channel> &channels = server->getChannels();
+	std::map<std::string, Channel>::iterator channels_it = channels.begin();
+	for (; channels_it != channels.end(); channels_it++) {
+		if (channels_it->first == target)
+			return true;
+	}
+
 	return false;
 }
 
