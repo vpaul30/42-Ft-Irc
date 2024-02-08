@@ -61,6 +61,7 @@ class Server {
 
 		User *getUserByNickname(std::string nickname);
 		std::map<std::string, Channel> &getChannels();
+		// Channel &getChannelByName(std::string &channel_name);
 
 		// === COMMANDS ===
 		int executeCommand(User &user, MsgInfo &msg_info);

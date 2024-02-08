@@ -90,14 +90,23 @@ int Server::loop() {
 				break;
 			} else if (m_fds[i].revents & POLLOUT) {
 				User &user = m_users[m_fds[i].fd];
+			 	// std::cout << "rpl buf(pollout): " << user.getRplBuffer() << " user: " << user.getNickname() << std::endl;
 				if (!user.getRplBuffer().empty()) {
 					std::string &rpl_buffer = user.getRplBuffer();
 					size_t bytes_sent = send(user.getFd(), rpl_buffer.c_str(), rpl_buffer.size(), 0);
+					// std::cout << "rpl buf size = " << rpl_buffer.size() << " bytes_sent = " << bytes_sent << std::endl;
 					logMsg(rpl_buffer.substr(0, bytes_sent), CLIENT);
 					rpl_buffer.erase(0, bytes_sent);
 					if (user.getMustDisconnect() == true) // after sending the reply check if user must be disconnected
 						disconnectUser(user.getFd());
 					if (rpl_buffer.empty())
+						m_fds[i].events = POLLIN;
+				}
+				else {
+					std::cout << "EMPTY POLLOUT!!!\n";
+					User &user = m_users[m_fds[i].fd];
+					std::cout << "USER: " << user.getNickname() << std::endl;
+					if (user.getRplBuffer().empty())
 						m_fds[i].events = POLLIN;
 				}
 				break;
@@ -107,6 +116,13 @@ int Server::loop() {
 	cleanup();
 	return 0;
 }
+
+
+/*
+
+	PASS 12312321\r\nUSER p adsada dawda\r\n
+
+*/
 
 int Server::processUserMsg(User &user) {
 	std::string &user_msg = user.getMsgBuffer();
@@ -360,3 +376,8 @@ User *Server::getUserByNickname(std::string nickname) {
 }
 
 std::map<std::string, Channel> &Server::getChannels() { return m_channels; }
+
+// Channel &Server::getChannelByName(std::string &channel_name) {
+// 	Channel channel = m_channels.find(channel_name);
+// 	return channel;
+// }

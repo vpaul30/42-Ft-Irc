@@ -19,6 +19,7 @@
 #define ERR_NOSUCHNICK(nickname, target_nickname) (":localhost 401 " + nickname +  " " + target_nickname + ":No such nick/channel\r\n")
 
 #define ERR_NOSUCHCHANNEL(nickname, channel) (":localhost 403 " + nickname + " " + channel + " :No such channel\r\n")
+#define ERR_CANNOTSENDTOCHAN(nickname, channel) (":localhost 404 " + nickname + " " + channel + " :Cannot send to nick/channel\r\n")
 #define ERR_NOTONCHANNEL(nickname, channel) (":localhost 442 " + nickname + " " + channel + " :You're not on that channel\r\n")
 #define ERR_CHANOPRIVSNEEDED(nickname, channel) (":localhost 482 " + nickname + " " + channel + " :You're not channel operator\r\n")
 #define ERR_USERNOTINCHANNEL(nickname, who, channel) (":localhost 441 " + nickname + " " + who + " " + channel + " :They aren't on that channel\r\n")
@@ -38,5 +39,5 @@
 #define RPL_INVITING(nickname, who, channel) (":localhost 341 " + nickname + " " + who + " " + channel)
 
 #define NICK(old_nickname, username, hostname, new_nickname) ("changed nickname to " + new_nickname + "\r\n")
-#define PRIVMSG(target_nickname, message) ("PRIVMSG " + target_nickname + " :" + message + "\r\n");
+#define PRIVMSG(target_nickname, message) ("PRIVMSG " + target_nickname + " :" + message + "\r\n")
 #define JOIN(channel) ("JOIN " + channel + "\r\n")
