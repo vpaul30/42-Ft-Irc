@@ -125,7 +125,7 @@ int Server::processUserMsg(User &user) {
 			}
 			executeCommand(user, msg_info);
 			// once server has nickname and username it tries to register user
-			if (!user.getNickname().empty() && !user.getUsername().empty()) {
+			if (!user.getNickname().empty() && !user.getUsername().empty() && user.getIsPassValid()) {
 				if (user.getIsPassValid() && validateUsername(user.getUsername())) { // valid registration
 					user.setIsAuthorised(true);
 					std::string reply = registrationMessage(*this, user);
@@ -155,6 +155,10 @@ int Server::executeCommand(User &user, MsgInfo &msg_info) {
 		privmsgCommand(user, msg_info);
 	} else if (msg_info.cmd == "JOIN") {
 		joinCommand(user, msg_info);
+	} else if (msg_info.cmd == "TOPIC") {
+		topicCommand(user, msg_info);
+	} else if (msg_info.cmd == "INVITE") {
+		inviteCommand(user, msg_info);
 	}
 	else {
 		// unknown command: ...
