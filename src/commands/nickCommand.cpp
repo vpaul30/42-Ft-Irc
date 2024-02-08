@@ -15,8 +15,8 @@
 		(if user is already registered server will reply on successful nick change)
 */
 
-static bool validateNickname(std::string &nickname);
-static bool isNicknameAvailable(Server *server, std::string &nickname);
+bool validateNickname(const std::string &nickname);
+bool isNicknameAvailable(Server *server, const std::string &nickname);
 
 
 int Server::nickCommand(User &user, MsgInfo &msg_info) {
@@ -52,7 +52,7 @@ int Server::nickCommand(User &user, MsgInfo &msg_info) {
 	return 0;
 }
 
-static bool validateNickname(std::string &nickname) {
+bool validateNickname(const std::string &nickname) {
 	// no leading '#' or ':'
 	// no ASCII space
 	// no ',' '.' '*' '?' '!' '@'
@@ -63,7 +63,7 @@ static bool validateNickname(std::string &nickname) {
 	return true;
 }
 
-static bool isNicknameAvailable(Server *server, std::string &nickname) {
+bool isNicknameAvailable(Server *server, const std::string &nickname) {
 	std::map<int, User> &users = server->getUsers();
 	std::map<int, User>::iterator it = users.begin();
 

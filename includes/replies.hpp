@@ -16,7 +16,7 @@
 
 #define ERR_NORECIPIENT(nickname) (":localhost 411 " + nickname + " :No recipient given (PRIVMSG)\r\n")
 #define ERR_NOTEXTTOSEND(nickname) (":localhost 412 " + nickname + " :No text to send\r\n")
-#define ERR_NOSUCHNICK(nickname, target_nickname) (":localhost 401 " + nickname +  " " + target_nickname + ":No such nick/channel\r\n")
+#define ERR_NOSUCHNICK(nickname, target_nickname) (":localhost 401 " + nickname +  " " + target_nickname + " :No such nick/channel\r\n")
 
 #define ERR_NOSUCHCHANNEL(nickname, channel) (":localhost 403 " + nickname + " " + channel + " :No such channel\r\n")
 #define ERR_CANNOTSENDTOCHAN(nickname, channel) (":localhost 404 " + nickname + " " + channel + " :Cannot send to nick/channel\r\n")
@@ -33,10 +33,10 @@
 #define RPL_MYINFO(nickname) (":localhost 004 " + nickname + " FT_IRC 1.0 oiws itkol k\r\n")
 #define RPL_ISUPPORT(nickname) (":localhost 005 " + nickname + " MAXTARGETS=1 NICKLEN=12  :are supported by this server\r\n")
 
-#define RPL_NOTOPIC(nickname, channel) (":localhost 331 " + nickname + " " + channel + " :No topic is set")
-// #define RPL_TOPIC(nickname, //channel, //topic) (":localhost 332 " + nickname + " " + channel + " :" + topic)
-// #define RPL_TOPICWHOTIME(nickname, //channel, //who, //time) (":localhost 333 " + nickname + " " + channel + " " + who + " " + time)
-#define RPL_INVITING(nickname, who, channel) (":localhost 341 " + nickname + " " + who + " " + channel)
+#define RPL_NOTOPIC(nickname, channel) (":localhost 331 " + nickname + " " + channel + " :No topic is set\r\n")
+#define RPL_TOPIC(nickname, channel, topic) (":localhost 332 " + nickname + " " + channel + " :" + topic + "\r\n")
+#define RPL_TOPICWHOTIME(nickname, channel, who, time) (":localhost 333 " + nickname + " " + channel + " " + who + " " + time + "\r\n")
+#define RPL_INVITING(nickname, who, channel) (":localhost 341 " + nickname + " " + who + " " + channel + "\r\n")
 
 #define NICK(old_nickname, username, hostname, new_nickname) ("changed nickname to " + new_nickname + "\r\n")
 #define PRIVMSG(target_nickname, message) ("PRIVMSG " + target_nickname + " :" + message + "\r\n")

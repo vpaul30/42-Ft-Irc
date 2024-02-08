@@ -1,5 +1,6 @@
 #include "../../includes/server.hpp"
 #include "../../includes/replies.hpp"
+#include "../../includes/channel.hpp"
 
 /*
 	Command: KICK
@@ -24,7 +25,6 @@
 		:WiZ!jto@tolsun.oulu.fi KICK #Finnish John        ; KICK message on channel #Finnish from WiZ to remove John from channel
 */
 
-// implement functions for: userExists, channelExists, userInChannel, nickInChannel, userIsOperator
 // think about if BADCHANMASK is needed
 
 static std::pair<std::string, std::string> paramSplit(const std::string& params) {
@@ -55,31 +55,32 @@ static std::vector<std::string> splitUsersList(const std::string& usersList, cha
 
 int Server::kickCommand(User &user, MsgInfo &msg_info) {
 
-	if (msg_info.params.empty()) {
+	std::pair<std::string, std::string> splitParams = paramSplit(msg_info.params);
+	std::string channelName = splitParams.first;
+	std::string remainder = splitParams.second;
+
+	if (msg_info.params.empty() || channelName.empty() || remainder.empty()) {
 		// ERR_NEEDMOREPARAMS (461)
 		std::string reply = ERR_NEEDMOREPARAMS(user.getNickname(), msg_info.cmd);
 		addRplAndPollout(user, reply);
+		return 0;
 	}
 
-	std::pair<std::string, std::string> splitParams = paramSplit(msg_info.params);
-	std::string channel = splitParams.first;
-	std::string remainder = splitParams.second;
-
-	if (!channelExists(channel)) {
+	if (channelNotExistent(channelName)) {
 		// ERR_NOSUCHCHANNEL (403)
-		std::string reply = ERR_NOSUCHCHANNEL(user.getNickname(), channel);
+		std::string reply = ERR_NOSUCHCHANNEL(user.getNickname(), channelName);
 		addRplAndPollout(user, reply);
 	}
 
-	if (!userInChannel(user, channel)) {
+	if (!userInChannel(user, channelName)) {
 		// ERR_NOTONCHANNEL (442)
-		std::string reply = ERR_NOTONCHANNEL(user.getNickname(), channel);
+		std::string reply = ERR_NOTONCHANNEL(user.getNickname(), channelName);
 		addRplAndPollout(user, reply);
 	}
 
-	if (!userIsOperator(user, channel)) {
+	if (!userIsOperator(user, channelName)) {
 		// ERR_CHANOPRIVSNEEDED (482)
-		std::string reply = ERR_CHANOPRIVSNEEDED(user.getNickname(), channel);
+		std::string reply = ERR_CHANOPRIVSNEEDED(user.getNickname(), channelName);
 		addRplAndPollout(user, reply);
 	}
 
@@ -89,15 +90,15 @@ int Server::kickCommand(User &user, MsgInfo &msg_info) {
 
 	std::vector<std::string> users = splitUsersList(usersList, ',');
 	for (size_t i = 0; i < users.size(); ++i) {
-		if (!userExists(users[i])) {
+		if (nickNotExistent(users[i])) {
 			// ERR_NOSUCHNICK (401)
 			std::string reply = ERR_NOSUCHNICK(user.getNickname(), users[i]);
 			addRplAndPollout(user, reply);
 		}
 
-		if (!nickInChannel(users[i], channel)) {
+		if (!nickInChannel(users[i], channelName)) {
 			// ERR_USERNOTINCHANNEL (441)
-			std::string reply = ERR_USERNOTINCHANNEL(user.getNickname(), users[i], channel);
+			std::string reply = ERR_USERNOTINCHANNEL(user.getNickname(), users[i], channelName);
 			addRplAndPollout(user, reply);
 		}
 
@@ -107,7 +108,7 @@ int Server::kickCommand(User &user, MsgInfo &msg_info) {
 	}
 
 	// 	// ERR_BADCHANMASK (476)
-	// 	std::string reply = ERR_BADCHANMASK(//channel);
+	// 	std::string reply = ERR_BADCHANMASK(//channelName);
 	// 	addRplAndPollout(user, reply);
 
 	return 0;
