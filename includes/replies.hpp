@@ -39,7 +39,8 @@
 #define RPL_INVITING(nickname, who, channel) (":localhost 341 " + nickname + " " + who + " " + channel + "\r\n")
 
 #define NICK(old_nickname, username, hostname, new_nickname) ("changed nickname to " + new_nickname + "\r\n") // should be sent with prefix
-#define PRIVMSG(target_nickname, message) ("PRIVMSG " + target_nickname + " :" + message + "\r\n") // should be sent with prefix
+#define PRIVMSG(target, message) ("PRIVMSG " + target + " :" + message + "\r\n") // should be sent with prefix
+#define NOTICE(target, message) ("NOTICE " + target + " :" + message + "\r\n") // should be sent with prefix
 #define JOIN(channel) ("JOIN " + channel + "\r\n") // should be sent with prefix
 #define QUIT(nickname) ("QUIT : " + nickname + " closed the connection\r\n") // should be sent with prefix
 // :pos2!~pos2u@188.244.102.158 QUIT :Remote host closed the connection

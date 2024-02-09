@@ -71,17 +71,11 @@ class Server {
 		int nickCommand(User &user, MsgInfo &msg_info);
 		int userCommand(User &user, MsgInfo &msg_info);
 		int privmsgCommand(User &user, MsgInfo &msg_info);
+		int noticeCommand(User &user, MsgInfo &msg_info);
 		int joinCommand(User &user, MsgInfo &msg_info);
 		int partCommand(User &user, MsgInfo msg_info);
 		int topicCommand(User &user, MsgInfo &msg_info);
 		// int inviteCommand(User &user, MsgInfo &msg_info);
-
-		// topic
-		// bool channelNotExistent(const std::string& channel);
-		// bool userInChannel(const User& user, const std::string& channel);
-		// bool userIsOperator(const User& user, const std::string& channel);
-		// bool nickNotExistent(const std::string& nickname);
-		// bool nickInChannel(const std::string& nick, const std::string &channel);
 
 	private:
 		// arguments

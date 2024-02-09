@@ -171,6 +171,9 @@ int Server::executeCommand(User &user, MsgInfo &msg_info) {
 	else if (msg_info.cmd == "PART") {
 		partCommand(user, msg_info);
 	}
+	else if (msg_info.cmd == "NOTICE") {
+		noticeCommand(user, msg_info);
+	}
 	// else if (msg_info.cmd == "INVITE") {
 	// 	inviteCommand(user, msg_info);
 	// }
