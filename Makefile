@@ -8,7 +8,8 @@ NAME = ircserv
 SOURCES = src/main.cpp src/server.cpp src/user.cpp src/channel.cpp src/utils.cpp \
 		src/commands/passCommand.cpp src/commands/nickCommand.cpp src/commands/userCommand.cpp \
 		src/commands/privmsgCommand.cpp src/commands/joinCommand.cpp src/commands/topicCommand.cpp \
-		src/commands/inviteCommand.cpp
+		src/commands/partCommand.cpp
+		# src/commands/inviteCommand.cpp
 
 OBJECTS = $(SOURCES:.cpp=.o)
 

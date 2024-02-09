@@ -34,10 +34,16 @@
 #define RPL_ISUPPORT(nickname) (":localhost 005 " + nickname + " MAXTARGETS=1 NICKLEN=12  :are supported by this server\r\n")
 
 #define RPL_NOTOPIC(nickname, channel) (":localhost 331 " + nickname + " " + channel + " :No topic is set\r\n")
-#define RPL_TOPIC(nickname, channel, topic) (":localhost 332 " + nickname + " " + channel + " :" + topic + "\r\n")
+#define RPL_TOPIC(nickname, channel, topic) (":localhost 332 " + nickname + " " + channel + " " + topic + "\r\n")
 #define RPL_TOPICWHOTIME(nickname, channel, who, time) (":localhost 333 " + nickname + " " + channel + " " + who + " " + time + "\r\n")
 #define RPL_INVITING(nickname, who, channel) (":localhost 341 " + nickname + " " + who + " " + channel + "\r\n")
 
-#define NICK(old_nickname, username, hostname, new_nickname) ("changed nickname to " + new_nickname + "\r\n")
-#define PRIVMSG(target_nickname, message) ("PRIVMSG " + target_nickname + " :" + message + "\r\n")
-#define JOIN(channel) ("JOIN " + channel + "\r\n")
+#define NICK(old_nickname, username, hostname, new_nickname) ("changed nickname to " + new_nickname + "\r\n") // should be sent with prefix
+#define PRIVMSG(target_nickname, message) ("PRIVMSG " + target_nickname + " :" + message + "\r\n") // should be sent with prefix
+#define JOIN(channel) ("JOIN " + channel + "\r\n") // should be sent with prefix
+#define QUIT(nickname) ("QUIT : " + nickname + " closed the connection\r\n") // should be sent with prefix
+// :pos2!~pos2u@188.244.102.158 QUIT :Remote host closed the connection
+#define TOPIC(channel, topic) ("TOPIC " + channel + " " + topic + "\r\n") // should be sent with prefix
+// :pos1!~pos1u@188.244.102.158 TOPIC #pos1 :mynewtopic
+#define PART(channel) ("PART " + channel + "\r\n") // should be sent with prefix
+// :pos2!~pos2u@188.244.102.158 PART #pos1

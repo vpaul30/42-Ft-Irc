@@ -27,10 +27,10 @@
 */
 
 static bool hasOneWord(std::string &params);
-static std::string getTarget(std::string &params);
+// static std::string getTarget(std::string &params);
 static bool checkTargetExist(Server *server, std::string &params);
 static std::string getMessageText(std::string &params);
-static bool checkUserInChannel(Server *server, User &user, std::string &channel_name);
+// static bool checkUserInChannel(Server *server, std::string &nickname, std::string &channel_name);
 
 
 int Server::privmsgCommand(User &user, MsgInfo &msg_info) {
@@ -55,18 +55,15 @@ int Server::privmsgCommand(User &user, MsgInfo &msg_info) {
 	}
 	std::string target = getTarget(msg_info.params);
 	if (target[0] == '#') { // target is a channel
-		// check if user belongs to channel
-		if (checkUserInChannel(this, user, target) == false) {
+		if (checkUserInChannel(this, target, user.getNickname()) == false) {
 			// ERR_CANNOTSENDTOCHAN (404)
 			std::string reply = ERR_CANNOTSENDTOCHAN(user.getNickname(), target);
 			addRplAndPollout(user, reply);
 			return 0;
 		}
-		// broadcast the message
-		Channel &channel_to_join = m_channels[target];
 		std::string reply = prefix(user.getNickname(), user.getUsername(), user.getHostname());
 		reply += PRIVMSG(target, getMessageText(msg_info.params));
-		channel_to_join.broadcastMsg(this, user, reply);
+		m_channels[target].broadcastMsg(this, user.getNickname(), reply);
 	} else { // target is another user
 		std::string reply = prefix(user.getNickname(), user.getUsername(), user.getHostname());
 		reply += PRIVMSG(target, getMessageText(msg_info.params));
@@ -86,11 +83,11 @@ static bool hasOneWord(std::string &params) {
 	return true;
 }
 
-static std::string getTarget(std::string &params) {
-	size_t pos = params.find(' ');
-	std::string target = params.substr(0, pos);
-	return target;
-}
+// static std::string getTarget(std::string &params) {
+// 	size_t pos = params.find(' ');
+// 	std::string target = params.substr(0, pos);
+// 	return target;
+// }
 
 static bool checkTargetExist(Server *server, std::string &params) {
 	std::string target = getTarget(params);
@@ -133,21 +130,4 @@ static std::string getMessageText(std::string &params) {
 			text = copy;
 	}
 	return text;
-}
-
-static bool checkUserInChannel(Server *server, User &user, std::string &channel_name) {
-	std::map<std::string, Channel> &channels = server->getChannels();
-	Channel &channel = channels[channel_name];
-
-	std::vector<User> users = channel.getUsers();
-	for (int i = 0; i < users.size(); i++) {
-		if (user.getNickname() == users[i].getNickname())
-			return true;
-	}
-	std::vector<User> operators = channel.getOperators();
-	for (int i = 0; i < operators.size(); i++) {
-		if (user.getNickname() == operators[i].getNickname())
-			return true;
-	}
-	return false;
 }

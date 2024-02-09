@@ -35,8 +35,8 @@ class User {
 		bool getIsAuthorised();
 		void setIsAuthorised(bool value);
 		// m_nickname
-		const std::string &getNickname() const;
-		void setNickname(const std::string &nickname);
+		std::string &getNickname();
+		void setNickname(std::string &nickname);
 		// m_username
 		std::string &getUsername();
 		void setUsername(std::string &username);

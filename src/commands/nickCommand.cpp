@@ -15,9 +15,9 @@
 		(if user is already registered server will reply on successful nick change)
 */
 
-bool validateNickname(const std::string &nickname);
-bool isNicknameAvailable(Server *server, const std::string &nickname);
-
+static bool validateNickname(const std::string &nickname);
+static bool isNicknameAvailable(Server *server, const std::string &nickname);
+static void replaceNicknameInChannels(Server *server, std::string &old_nickname, std::string &new_nickname);
 
 int Server::nickCommand(User &user, MsgInfo &msg_info) {
 	if (msg_info.params.empty()) {
@@ -44,15 +44,16 @@ int Server::nickCommand(User &user, MsgInfo &msg_info) {
 		std::string reply = prefix(old_nickname, user.getUsername(), user.getHostname());
 		reply += NICK(old_nickname, user.getUsername(), user.getHostname(), msg_info.params);
 		addRplAndPollout(user, reply);
-
+		replaceNicknameInChannels(this, old_nickname, user.getNickname());
 	} else {
+		std::string old_nickname = user.getNickname();
 		user.setNickname(msg_info.params);
 	}
 
 	return 0;
 }
 
-bool validateNickname(const std::string &nickname) {
+static bool validateNickname(const std::string &nickname) {
 	// no leading '#' or ':'
 	// no ASCII space
 	// no ',' '.' '*' '?' '!' '@'
@@ -63,7 +64,7 @@ bool validateNickname(const std::string &nickname) {
 	return true;
 }
 
-bool isNicknameAvailable(Server *server, const std::string &nickname) {
+static bool isNicknameAvailable(Server *server, const std::string &nickname) {
 	std::map<int, User> &users = server->getUsers();
 	std::map<int, User>::iterator it = users.begin();
 
@@ -75,3 +76,21 @@ bool isNicknameAvailable(Server *server, const std::string &nickname) {
 	return true;
 }
 
+static void replaceNicknameInChannels(Server *server, std::string &old_nickname, std::string &new_nickname) {
+	std::map<std::string, Channel> &channels = server->getChannels();
+	std::map<std::string, Channel>::iterator channels_it = channels.begin();
+
+	std::vector<std::string>::iterator nicknames_it;
+	for (; channels_it != channels.end(); channels_it++) {
+		nicknames_it = channels_it->second.getUsers().begin();
+		for (; nicknames_it != channels_it->second.getUsers().end(); nicknames_it++) {
+			if (*nicknames_it == old_nickname)
+				*nicknames_it = new_nickname;
+		}
+		nicknames_it = channels_it->second.getOperators().begin();
+		for (; nicknames_it != channels_it->second.getOperators().end(); nicknames_it++) {
+			if (*nicknames_it == old_nickname)
+				*nicknames_it = new_nickname;
+		}
+	}
+}

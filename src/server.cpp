@@ -103,9 +103,9 @@ int Server::loop() {
 						m_fds[i].events = POLLIN;
 				}
 				else {
-					std::cout << "EMPTY POLLOUT!!!\n";
+					// std::cout << "EMPTY POLLOUT!!!\n";
 					User &user = m_users[m_fds[i].fd];
-					std::cout << "USER: " << user.getNickname() << std::endl;
+					// std::cout << "USER: " << user.getNickname() << std::endl;
 					if (user.getRplBuffer().empty())
 						m_fds[i].events = POLLIN;
 				}
@@ -116,13 +116,6 @@ int Server::loop() {
 	cleanup();
 	return 0;
 }
-
-
-/*
-
-	PASS 12312321\r\nUSER p adsada dawda\r\n
-
-*/
 
 int Server::processUserMsg(User &user) {
 	std::string &user_msg = user.getMsgBuffer();
@@ -141,7 +134,7 @@ int Server::processUserMsg(User &user) {
 			}
 			executeCommand(user, msg_info);
 			// once server has nickname and username it tries to register user
-			if (!user.getNickname().empty() && !user.getUsername().empty() && user.getIsPassValid()) {
+			if (!user.getNickname().empty() && !user.getUsername().empty()) {
 				if (user.getIsPassValid() && validateUsername(user.getUsername())) { // valid registration
 					user.setIsAuthorised(true);
 					std::string reply = registrationMessage(*this, user);
@@ -171,11 +164,16 @@ int Server::executeCommand(User &user, MsgInfo &msg_info) {
 		privmsgCommand(user, msg_info);
 	} else if (msg_info.cmd == "JOIN") {
 		joinCommand(user, msg_info);
-	} else if (msg_info.cmd == "TOPIC") {
+	} 
+	else if (msg_info.cmd == "TOPIC") {
 		topicCommand(user, msg_info);
-	} else if (msg_info.cmd == "INVITE") {
-		inviteCommand(user, msg_info);
 	}
+	else if (msg_info.cmd == "PART") {
+		partCommand(user, msg_info);
+	}
+	// else if (msg_info.cmd == "INVITE") {
+	// 	inviteCommand(user, msg_info);
+	// }
 	else {
 		// unknown command: ...
 	}
@@ -269,9 +267,49 @@ void Server::disconnectUser(int fd) {
 		it++;
 	}
 	std::string msg = m_users[fd].getHostname() + ":" + intToString(m_users[fd].getPort()) + " disconnected.";
+	std::string reply = prefix(m_users[fd].getNickname(), m_users[fd].getUsername(), m_users[fd].getHostname());
+	reply += QUIT(m_users[fd].getNickname());
+
+	removeUserFromChannels(m_users[fd].getNickname(), reply);
+	removeEmptyChannels();
 	m_users.erase(fd);
 	close(fd);
 	logMsg(msg, SERVER);
+}
+
+void Server::removeUserFromChannels(std::string &nickname, std::string &reply) {
+	std::map<std::string, Channel>::iterator channels_it = m_channels.begin();
+	std::vector<std::string>::iterator nicknames_it;
+	for (; channels_it != m_channels.end(); channels_it++) {
+		nicknames_it = channels_it->second.getUsers().begin();
+		for (; nicknames_it != channels_it->second.getUsers().end(); nicknames_it++) {
+			if (*nicknames_it == nickname) {
+				channels_it->second.broadcastMsg(this, nickname, reply);
+				channels_it->second.getUsers().erase(nicknames_it);
+				break;
+			}
+		}
+		nicknames_it = channels_it->second.getOperators().begin();
+		for (; nicknames_it != channels_it->second.getOperators().end(); nicknames_it++) {
+			if (*nicknames_it == nickname) {
+				channels_it->second.getOperators().erase(nicknames_it);
+				break;
+			}
+		}
+	}
+}
+
+void Server::removeEmptyChannels() {
+	std::map<std::string, Channel>::iterator channels_it = m_channels.begin();
+	while (channels_it != m_channels.end()) {
+		if (channels_it->second.getUsers().empty() && channels_it->second.getOperators().empty()) {
+			std::cout << channels_it->first << " is empty.\n";
+			m_channels.erase(channels_it);
+			channels_it = m_channels.begin();
+			continue;
+		}
+		channels_it++;
+	}
 }
 
 // returns 0 when '\r\n' is not found

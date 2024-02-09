@@ -14,3 +14,13 @@ std::string intToString(int value);
 bool validateUsername(std::string &username);
 
 std::string registrationMessage(Server &server, User &user);
+
+bool checkChannelExist(Server *server, std::string &channel_name);
+
+bool checkUserInChannel(Server *server, std::string &channel_name, std::string &nickname);
+
+bool checkUserChannelOperator(Server *server, std::string &channel_name, std::string &nickname);
+
+std::string formatTime(std::time_t raw);
+
+std::string getTarget(std::string &params);

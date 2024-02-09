@@ -58,6 +58,8 @@ class Server {
 		void addPolloutToPollfd(int user_fd);
 		void addRplAndPollout(User &user, std::string &reply);
 		std::string &getTimeOfStart();
+		void removeUserFromChannels(std::string &nickname, std::string &reply);
+		void removeEmptyChannels();
 
 		User *getUserByNickname(std::string nickname);
 		std::map<std::string, Channel> &getChannels();
@@ -70,15 +72,16 @@ class Server {
 		int userCommand(User &user, MsgInfo &msg_info);
 		int privmsgCommand(User &user, MsgInfo &msg_info);
 		int joinCommand(User &user, MsgInfo &msg_info);
+		int partCommand(User &user, MsgInfo msg_info);
 		int topicCommand(User &user, MsgInfo &msg_info);
-		int inviteCommand(User &user, MsgInfo &msg_info);
+		// int inviteCommand(User &user, MsgInfo &msg_info);
 
 		// topic
-		bool channelNotExistent(const std::string& channel);
-		bool userInChannel(const User& user, const std::string& channel);
-		bool userIsOperator(const User& user, const std::string& channel);
-		bool nickNotExistent(const std::string& nickname);
-		bool nickInChannel(const std::string& nick, const std::string &channel);
+		// bool channelNotExistent(const std::string& channel);
+		// bool userInChannel(const User& user, const std::string& channel);
+		// bool userIsOperator(const User& user, const std::string& channel);
+		// bool nickNotExistent(const std::string& nickname);
+		// bool nickInChannel(const std::string& nick, const std::string &channel);
 
 	private:
 		// arguments

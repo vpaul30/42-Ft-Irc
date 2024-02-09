@@ -53,8 +53,8 @@ void User::setRplBuffer(std::string &rpl_buffer) { m_rpl_buffer = rpl_buffer; }
 bool User::getIsAuthorised() { return m_is_authorised; }
 void User::setIsAuthorised(bool value) { m_is_authorised = value; }
 
-const std::string &User::getNickname() const { return m_nickname; }
-void User::setNickname(const std::string &nickname) { m_nickname = nickname; }
+std::string &User::getNickname() { return m_nickname; }
+void User::setNickname(std::string &nickname) { m_nickname = nickname; }
 
 std::string &User::getUsername() { return m_username; }
 void User::setUsername(std::string &username) { m_username = username; }

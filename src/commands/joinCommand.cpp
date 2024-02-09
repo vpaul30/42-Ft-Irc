@@ -1,5 +1,6 @@
 #include "../../includes/server.hpp"
 #include "../../includes/replies.hpp"
+// #include "../../includes/utils.hpp"
 
 /*
 	Command: JOIN
@@ -28,7 +29,8 @@
 static void getChannelNames(std::vector<std::string> &channel_names, std::string &params);
 static void getChannelKeys(std::vector<std::string> &channel_keys, std::string &params);
 static bool isChannelNameValid(std::string &channel_name);
-static bool checkChannelExist(Server *server, std::string &channel_name);
+// static bool checkChannelExist(Server *server, std::string &channel_name);
+// static bool checkUserInChannel(Server *server, std::string &channel_name, std::string &nickname);
 
 int Server::joinCommand(User &user, MsgInfo &msg_info) {
 	if (msg_info.params.empty()) {
@@ -51,22 +53,37 @@ int Server::joinCommand(User &user, MsgInfo &msg_info) {
 			std::string reply = ERR_NOSUCHCHANNEL(user.getNickname(), channel_name);
 			addRplAndPollout(user, reply);
 		} else if (checkChannelExist(this, channel_name) == true) { // channel exists, try to join
-			std::cout << "trying to join " << channel_name << std::endl;
-			// if server has no password
-			// if server is not in invite only mode
-			// is server is not full (in case of user limit)
-			// join the channel
+			if (checkUserInChannel(this, channel_name, user.getNickname()) == true) // if user is already in that channel, simply ignore join command
+				return 0;
 			Channel &channel_to_join = m_channels[channel_name];
-			channel_to_join.addNewUser(user);
+			if (!channel_to_join.getPassword().empty()) {
+				std::string &password = channel_to_join.getPassword();
+				if (channel_keys.size() < i + 1) {
+					std::cout << "No key specified to join the channel: " << channel_name << std::endl;
+					continue;
+				} else if (channel_keys[i] != password) {
+					std::cout << "Wrong password. Cannot join the channel: " << channel_name << std::endl;
+					continue;
+				}
+			} else if (channel_to_join.getInviteOnly() == true) {
+				; // check if user is invited then join
+			} else if (channel_to_join.getUsersLimit() != -1) {
+				; // check if there is space for user then join
+			}
+
+			channel_to_join.addNewUser(user.getNickname());
 			std::string reply = prefix(user.getNickname(), user.getUsername(), user.getHostname());
 			reply += JOIN(channel_name);
 			addRplAndPollout(user, reply);
-			// broadcast reply to everyone else
-			channel_to_join.broadcastMsg(this, user, reply);
-			std::cout << "join try complete\n";
+			channel_to_join.broadcastMsg(this, user.getNickname(), reply);
+			if (channel_to_join.getTopic().empty() == false) {
+				reply = RPL_TOPIC(user.getNickname(), channel_name, channel_to_join.getTopic());
+				reply += RPL_TOPICWHOTIME(user.getNickname(), channel_name,
+						channel_to_join.getTopicSetter(), formatTime(channel_to_join.getTimeOfTopic()));
+				addRplAndPollout(user, reply);
+			}
 		} else { // channel doesn't exist, create a new one
-			std::cout << "creating " << channel_name << std::endl;
-			Channel new_channel(channel_name, user);
+			Channel new_channel(channel_name, user.getNickname());
 			m_channels.insert(std::pair<std::string, Channel>(channel_name, new_channel));
 			std::string reply = prefix(user.getNickname(), user.getUsername(), user.getHostname());
 			reply += JOIN(channel_name);
@@ -135,13 +152,6 @@ static bool isChannelNameValid(std::string &channel_name) {
 	if (channel_name[0] != '#')
 		return false;
 	if (channel_name.size() == 1)
-		return false;
-	return true;
-}
-
-static bool checkChannelExist(Server *server, std::string &channel_name) {
-	std::map<std::string, Channel> &channels = server->getChannels();
-	if (channels.find(channel_name) == channels.end())
 		return false;
 	return true;
 }

@@ -4,11 +4,16 @@ Channel::Channel() {
 	m_channel_name = "";
 	m_password = "";
 	m_topic = "";
+	m_invite_only = false;
+	m_users_limit = -1;
 }
 
-Channel::Channel(std::string channel_name, User &user) : m_channel_name(channel_name) {
-	// m_users.push_back(user);
-	m_operators.push_back(user);
+Channel::Channel(std::string &channel_name, std::string &nickname) : m_channel_name(channel_name) {
+	m_operators.push_back(nickname);
+	m_password = "";
+	m_topic = "";
+	m_invite_only = false;
+	m_users_limit = -1;
 }
 
 std::string &Channel::getTopic() { return m_topic; }
@@ -20,8 +25,8 @@ void Channel::setTopic(std::string &topic, const std::string& nickname) {
 const std::string& Channel::getTopicSetter() { return m_topicSetter; }
 std::time_t Channel::getTimeOfTopic() { return m_timeOfTopic; }
 
-std::vector<User> &Channel::getUsers() { return m_users; }
-std::vector<User> &Channel::getOperators() { return m_operators; }
+std::vector<std::string> &Channel::getUsers() { return m_users; }
+std::vector<std::string> &Channel::getOperators() { return m_operators; }
 
 std::string &Channel::getChannelName() { return m_channel_name; }
 void Channel::setChannelName(std::string &channel_name) { m_channel_name = channel_name; }
@@ -29,25 +34,30 @@ void Channel::setChannelName(std::string &channel_name) { m_channel_name = chann
 std::string &Channel::getPassword() { return m_password; }
 void Channel::setPassword(std::string &password) { m_password = password; }
 
+bool Channel::getInviteOnly() { return m_invite_only; }
+void Channel::setInviteOnly(bool value) { m_invite_only = value; }
 
-void Channel::addNewUser(User &user) {
-	m_users.push_back(user);
-}
+int Channel::getUsersLimit() { return m_users_limit; }
+void Channel::setUsersLimit(int limit) { m_users_limit = limit; }
 
-void Channel::broadcastMsg(Server *server, User &user_to_ignore, std::string msg) {
-	std::cout << "BROADCAST MESSAGE <" << msg << "> TO " << m_operators.size() << " ops and " << m_users.size() << " users.\n";
-	int i = 0;
-	for (; i < m_operators.size(); i++) {
-		if (m_operators[i].getNickname() == user_to_ignore.getNickname())
+void Channel::addNewUser(std::string &nickname) { m_users.push_back(nickname); }
+void Channel::addNewOperator(std::string &nickname) { m_operators.push_back(nickname); }
+
+
+// Broadcasts message to everyone except user_to_ignore
+void Channel::broadcastMsg(Server *server, std::string &nick_to_ignore, std::string &msg) {
+	int i;
+	for (i = 0; i < m_operators.size(); i++) {
+		User *user = server->getUserByNickname(m_operators[i]);
+		if (m_operators[i] == nick_to_ignore || user == NULL)
 			continue;
-		 server->addRplAndPollout(*(server->getUserByNickname(m_operators[i].getNickname())), msg);
-		//  std::cout << "rpl buf(bc): " << m_operators[i].getRplBuffer() << std::endl;
+		 server->addRplAndPollout(*user, msg);
 	}
-	i = 0;
-	for (; i < m_users.size(); i++) {
-		if (m_users[i].getNickname() == user_to_ignore.getNickname())
+
+	for (i = 0; i < m_users.size(); i++) {
+		User *user = server->getUserByNickname(m_users[i]);
+		if (m_users[i] == nick_to_ignore || user == NULL)
 			continue;
-		 server->addRplAndPollout(*(server->getUserByNickname(m_users[i].getNickname())), msg);
-		//  std::cout << "rpl buf(bc): " << m_users[i].getRplBuffer() << std::endl;
+		 server->addRplAndPollout(*user, msg);
 	}
 }
