@@ -65,6 +65,28 @@ bool checkUserChannelOperator(Server *server, std::string &channel_name, std::st
 	return false;
 }
 
+bool checkUserExist(Server *server, std::string &nickname) {
+	std::map<int, User> &users = server->getUsers();
+	std::map<int, User>::iterator users_it = users.begin();
+
+	for (; users_it != users.end(); users_it++) {
+		if (users_it->second.getNickname() == nickname)
+			return true;
+	}
+	return false;
+}
+
+bool checkUserInvited(Server *server, std::string &channel_name, std::string &nickname) {
+	Channel &channel = server->getChannels()[channel_name];
+	std::vector<std::string> &invited_users = channel.getInvitedUsers();
+
+	for (size_t i = 0; i < invited_users.size(); i++) {
+		if (invited_users[i] == nickname)
+			return true;
+	}
+	return false;
+}
+
 std::string formatTime(std::time_t raw) {
 	std::tm* time = std::localtime(&raw);
 	char buffer[80];

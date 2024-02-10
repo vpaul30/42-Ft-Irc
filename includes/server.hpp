@@ -84,7 +84,8 @@ class Server {
 		int partCommand(User &user, MsgInfo msg_info);
 		int topicCommand(User &user, MsgInfo &msg_info);
 		int operCommand(User &user, MsgInfo &msg_info);
-		// int inviteCommand(User &user, MsgInfo &msg_info);
+		int inviteCommand(User &user, MsgInfo &msg_info);
+		// int modeCommand(User &user, MsgInfo &msg_info);
 
 	private:
 		// arguments

@@ -174,7 +174,7 @@ int Server::processUserMsg(User &user) {
 			executeCommand(user, msg_info);
 			// once server has nickname and username it tries to register user
 			if (!user.getNickname().empty() && !user.getUsername().empty()) {
-				if (user.getIsPassValid() && !user.getUsername().empty() && validateUsername(user.getUsername())) { // valid registration
+				if (user.getIsPassValid() && validateUsername(user.getUsername())) { // valid registration
 					user.setIsAuthorised(true);
 					std::string reply = registrationMessage(*this, user);
 					addRplAndPollout(user, reply);
@@ -211,10 +211,9 @@ int Server::executeCommand(User &user, MsgInfo &msg_info) {
 		noticeCommand(user, msg_info);
 	} else if (msg_info.cmd == "OPER") {
 		operCommand(user, msg_info);
+	} else if (msg_info.cmd == "INVITE") {
+		inviteCommand(user, msg_info);
 	}
-	// else if (msg_info.cmd == "INVITE") {
-	// 	inviteCommand(user, msg_info);
-	// }
 	else {
 		// unknown command: ...
 	}
@@ -334,6 +333,13 @@ void Server::removeUserFromChannels(std::string &nickname, std::string &reply) {
 		for (; nicknames_it != channels_it->second.getOperators().end(); nicknames_it++) {
 			if (*nicknames_it == nickname) {
 				channels_it->second.getOperators().erase(nicknames_it);
+				break;
+			}
+		}
+		nicknames_it = channels_it->second.getInvitedUsers().begin();
+		for (; nicknames_it != channels_it->second.getInvitedUsers().end(); nicknames_it++) {
+			if (*nicknames_it == nickname) {
+				channels_it->second.getInvitedUsers().erase(nicknames_it);
 				break;
 			}
 		}

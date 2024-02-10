@@ -27,6 +27,7 @@ std::time_t Channel::getTimeOfTopic() { return m_timeOfTopic; }
 
 std::vector<std::string> &Channel::getUsers() { return m_users; }
 std::vector<std::string> &Channel::getOperators() { return m_operators; }
+std::vector<std::string> &Channel::getInvitedUsers() { return m_invited_users; }
 
 std::string &Channel::getChannelName() { return m_channel_name; }
 void Channel::setChannelName(std::string &channel_name) { m_channel_name = channel_name; }
@@ -42,6 +43,7 @@ void Channel::setUsersLimit(int limit) { m_users_limit = limit; }
 
 void Channel::addNewUser(std::string &nickname) { m_users.push_back(nickname); }
 void Channel::addNewOperator(std::string &nickname) { m_operators.push_back(nickname); }
+void Channel::addInvitedUser(std::string &nickname) { m_invited_users.push_back(nickname); }
 
 
 // Broadcasts message to everyone except user_to_ignore

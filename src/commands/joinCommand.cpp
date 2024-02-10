@@ -29,8 +29,7 @@
 static void getChannelNames(std::vector<std::string> &channel_names, std::string &params);
 static void getChannelKeys(std::vector<std::string> &channel_keys, std::string &params);
 static bool isChannelNameValid(std::string &channel_name);
-// static bool checkChannelExist(Server *server, std::string &channel_name);
-// static bool checkUserInChannel(Server *server, std::string &channel_name, std::string &nickname);
+static void removeUserFromInvited(Server *server, std::string &nickname);
 
 int Server::joinCommand(User &user, MsgInfo &msg_info) {
 	if (msg_info.params.empty()) {
@@ -155,3 +154,16 @@ static bool isChannelNameValid(std::string &channel_name) {
 		return false;
 	return true;
 }
+
+static void removeUserFromInvited(Server *server, std::string &channel_name, std::string &nickname) {
+	Channel &channel = server->getChannels()[channel_name];
+
+	std::vector<std::string>::iterator nicknames_it = channel.getInvitedUsers().begin();
+	for (; nicknames_it != channel.getInvitedUsers().end(); nicknames_it++) {
+		if (*nicknames_it == nickname) {
+			channel.getInvitedUsers().erase(nicknames_it);
+			break;
+		}
+	}	
+}
+

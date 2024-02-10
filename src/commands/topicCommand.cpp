@@ -80,7 +80,7 @@ int Server::topicCommand(User &user, MsgInfo &msg_info) {
 			return 0;
 		}
 	} else {
-		if (checkUserChannelOperator(this, channelName, user.getNickname()) == false) {
+		if (!checkUserChannelOperator(this, channelName, user.getNickname()) && !user.getIsOperator()) {
 			// ERR_CHANOPRIVSNEEDED (482)
 			reply = ERR_CHANOPRIVSNEEDED(user.getNickname(), channelName);
 			addRplAndPollout(user, reply);

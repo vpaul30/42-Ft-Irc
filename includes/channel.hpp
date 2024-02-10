@@ -25,6 +25,8 @@ class Channel {
 		std::vector<std::string> &getUsers();
 		// m_operators
 		std::vector<std::string> &getOperators();
+		// m_invited_users
+		std::vector<std::string> &getInvitedUsers();
 		// m_channel_name
 		std::string &getChannelName();
 		void setChannelName(std::string &channel_name);
@@ -41,6 +43,7 @@ class Channel {
 
 		void addNewUser(std::string &nickname);
 		void addNewOperator(std::string &nickname);
+		void addInvitedUser(std::string &nickname);
 		void broadcastMsg(Server *server, std::string &nick_to_ignore, std::string &msg);
 
 	private:
@@ -53,6 +56,7 @@ class Channel {
 		// std::vector<User> m_operators;
 		std::vector<std::string> m_users;
 		std::vector<std::string> m_operators;
+		std::vector<std::string> m_invited_users;
 		bool m_invite_only;
 		int m_users_limit;
 };

@@ -46,8 +46,6 @@
 #define NOTICE(target, message) ("NOTICE " + target + " :" + message + "\r\n") // should be sent with prefix
 #define JOIN(channel) ("JOIN " + channel + "\r\n") // should be sent with prefix
 #define QUIT(nickname) ("QUIT : " + nickname + " closed the connection\r\n") // should be sent with prefix
-// :pos2!~pos2u@188.244.102.158 QUIT :Remote host closed the connection
 #define TOPIC(channel, topic) ("TOPIC " + channel + " " + topic + "\r\n") // should be sent with prefix
-// :pos1!~pos1u@188.244.102.158 TOPIC #pos1 :mynewtopic
 #define PART(channel) ("PART " + channel + "\r\n") // should be sent with prefix
-// :pos2!~pos2u@188.244.102.158 PART #pos1
+#define INVITE(nickname, channel) ("INVITE " + nickname + " :" + channel + "\r\n") // should be sent with prefix

@@ -21,6 +21,10 @@ bool checkUserInChannel(Server *server, std::string &channel_name, std::string &
 
 bool checkUserChannelOperator(Server *server, std::string &channel_name, std::string &nickname);
 
+bool checkUserExist(Server *server, std::string &nickname);
+
+bool checkUserInvited(Server *server, std::string &channel_name, std::string &nickname);
+
 std::string formatTime(std::time_t raw);
 
 std::string getTarget(std::string &params);
