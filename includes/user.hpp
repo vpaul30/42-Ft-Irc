@@ -49,11 +49,16 @@ class User {
 		// m_must_disconnect
 		bool getMustDisconnect();
 		void setMustDisconnect(bool value);
+		// m_is_operator
+		bool getIsOperator();
+		void setIsOperator(bool value);
+		// m_operator_id
+		int getOperatorId();
+		void setOperatorId(int value);
 
 		// FUNCTIONS
 		void appendMsgBuffer(std::string &str);
 		void appendRplBuffer(std::string &str);
-		// void resetMsgBuffer();
 
 	private:
 		int m_fd;
@@ -65,6 +70,8 @@ class User {
 		bool m_must_disconnect;
 		bool m_is_authorised;
 		bool m_is_pass_valid;
+		bool m_is_operator;
+		int m_operator_id;
 		std::string m_nickname;
 		std::string m_username;
 		std::string m_realname;

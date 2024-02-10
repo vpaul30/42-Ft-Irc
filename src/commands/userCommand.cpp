@@ -23,17 +23,19 @@ int Server::userCommand(User &user, MsgInfo &msg_info) {
 		// ERR_ALREADYREGISTERED (462)
 		std::string reply = ERR_ALREADYREGISTERED(user.getNickname());
 		addRplAndPollout(user, reply);
-
-	} else if (msg_info.params.empty()) {
+		return 0;
+	}
+	if (msg_info.params.empty()) {
 		// ERR_NEEDMOREPARAMS (461)
 		std::string reply = ERR_NEEDMOREPARAMS(user.getNickname(), msg_info.cmd);
 		addRplAndPollout(user, reply);
-
-	} else if (validateParams(msg_info.params) == false) {
+		return 0;
+	}
+	if (validateParams(msg_info.params) == false) {
 		// ERR_NEEDMOREPARAMS (461)
 		std::string reply = ERR_NEEDMOREPARAMS(user.getNickname(), msg_info.cmd);
 		addRplAndPollout(user, reply);
-
+		return 0;
 	}
 	assignUsernameAndRealname(user, msg_info.params);
 	return 0;
@@ -44,7 +46,6 @@ static bool validateParams(std::string &params) {
 	std::string copy = params;
 	size_t pos;
 	int word_counter = 0;
-
 	while (word_counter < 4) {
 		if ((pos = copy.find(' ')) != std::string::npos) {
 			word_counter++;

@@ -20,7 +20,7 @@ static void removeUserFromChannel(Server *server, std::string &channel_name, std
 int Server::partCommand(User &user, MsgInfo msg_info) {
 	if (msg_info.params.empty()) {
 		// ERR_NEEDMOREPARAMS (461)
-		std::string reply = ERR_NEEDMOREPARAMS(user.getNickname(), "PART");
+		std::string reply = ERR_NEEDMOREPARAMS(user.getNickname(), msg_info.cmd);
 		addRplAndPollout(user, reply);
 		return 0;
 	}

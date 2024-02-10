@@ -1,13 +1,13 @@
-joinCommand.cpp -> joinCommand(): finish mode checks (password, invite, user_limit)
 server.cpp -> disconnectUser(): erase nickname from all channels (users and operators) | DONE
 privmsgCommand.cpp -> privmsgCommand(): when target is a channel, check if that channel exists? | DONE
 server.cpp -> disconnectUser(): check if only one user is left on any channel -> promote to channel_operator | DONE (no need)
 server.cpp -> disconnectUser(): check if only 0 users is left on any channel -> delete channel | DONE
 server.cpp -> disconnectUser(): broadcastMsg to other channel users ":pos2!~pos2u@188.244.102.158 QUIT :Remote host closed the connection" | DONE
-
 topicCommand.cpp -> send the right reply and broadcastMsg | DONE
 joinCommand.cpp -> when connecting to existing channel check if theres topic, if so send 332 333 | DONE
-
 partCommand.cpp | DONE
+noticeCommand.cpp | DONE
 
-noticeCommand.cpp
+operCommand.cpp | DONE
+fix USER with one word leads to successful registration | DONE
+joinCommand.cpp -> joinCommand(): finish mode checks (password, invite, user_limit)

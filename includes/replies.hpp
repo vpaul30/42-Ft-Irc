@@ -25,6 +25,8 @@
 #define ERR_USERNOTINCHANNEL(nickname, who, channel) (":localhost 441 " + nickname + " " + who + " " + channel + " :They aren't on that channel\r\n")
 #define ERR_USERONCHANNEL(nickname, who, channel) (":localhost 443 " + nickname + " " + who + " " + channel + " :is already on channel\r\n")
 
+#define ERR_NOOPERHOST(nickname) (":localhost 491 " + nickname + " :No operator for your host\r\n")
+
 // === REPLIES ===
 
 #define RPL_WELCOME(nickname) (":localhost 001 " + nickname + " :Welcome to the 42 Internet Relay Chat Network " + nickname + ".\r\n")
@@ -37,6 +39,7 @@
 #define RPL_TOPIC(nickname, channel, topic) (":localhost 332 " + nickname + " " + channel + " " + topic + "\r\n")
 #define RPL_TOPICWHOTIME(nickname, channel, who, time) (":localhost 333 " + nickname + " " + channel + " " + who + " " + time + "\r\n")
 #define RPL_INVITING(nickname, who, channel) (":localhost 341 " + nickname + " " + who + " " + channel + "\r\n")
+#define RPL_YOUREOPER(nickname) (":localhost 381 " + nickname + " :You are now an operator of FT_IRC\r\n")
 
 #define NICK(old_nickname, username, hostname, new_nickname) ("changed nickname to " + new_nickname + "\r\n") // should be sent with prefix
 #define PRIVMSG(target, message) ("PRIVMSG " + target + " :" + message + "\r\n") // should be sent with prefix

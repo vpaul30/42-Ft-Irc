@@ -4,6 +4,8 @@ User::User() {
 	m_fd = 0;
 	m_hostname = "";
 	m_port = 0;
+	m_operator_id = 0;
+	m_is_operator = false;
 	m_is_authorised = false;
 	m_is_pass_valid = false;
 	m_must_disconnect = false;
@@ -17,6 +19,8 @@ User::User() {
 
 User::User(int fd, std::string hostname, int port)
 	: m_fd(fd), m_hostname(hostname), m_port(port) {
+	m_operator_id = 0;
+	m_is_operator = false;
 	m_is_authorised = false;
 	m_is_pass_valid = false;
 	m_must_disconnect = false;
@@ -68,13 +72,15 @@ void User::setIsPassValid(bool value) { m_is_pass_valid = value; }
 bool User::getMustDisconnect() { return m_must_disconnect; }
 void User::setMustDisconnect(bool value) { m_must_disconnect = value; }
 
+bool User::getIsOperator() { return m_is_operator; }
+void User::setIsOperator(bool value) { m_is_operator = value; }
+
+int User::getOperatorId() { return m_operator_id; }
+void User::setOperatorId(int value) { m_operator_id = value; }
+
 void User::appendMsgBuffer(std::string &str) {
 	m_msg_buffer += str;
 }
-
-// void User::resetMsgBuffer() {
-// 	m_msg_buffer = "";
-// }
 
 void User::appendRplBuffer(std::string &str) {
 	m_rpl_buffer += str;

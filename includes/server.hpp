@@ -15,6 +15,7 @@
 #include <map>
 #include <time.h>
 #include <csignal>
+#include <fstream>
 #include <cerrno>
 #include "channel.hpp"
 #include "user.hpp"
@@ -30,6 +31,13 @@ struct MsgInfo {
 	std::string prefix;
 	std::string cmd;
 	std::string params;
+};
+
+struct OperInfo {
+	int id;
+	std::string name;
+	std::string password;
+	std::string host;
 };
 
 class Channel;
@@ -75,6 +83,7 @@ class Server {
 		int joinCommand(User &user, MsgInfo &msg_info);
 		int partCommand(User &user, MsgInfo msg_info);
 		int topicCommand(User &user, MsgInfo &msg_info);
+		int operCommand(User &user, MsgInfo &msg_info);
 		// int inviteCommand(User &user, MsgInfo &msg_info);
 
 	private:
@@ -91,6 +100,7 @@ class Server {
 		std::vector<pollfd> m_fds;
 		std::map<int, User> m_users;
 		std::map<std::string, Channel> m_channels;
+		std::vector<OperInfo> m_oper_info;
 
 		// limits
 		// const int max_connections;

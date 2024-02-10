@@ -18,6 +18,45 @@ Server::Server(int port, std::string password) : m_port(port), m_password(passwo
 // Creates a listening socket on localhost:<port>	
 int Server::setup() {
 	logMsg("Starting server...", SERVER);
+
+	// read from oper.conf
+	std::ifstream oper_file;
+	oper_file.open("oper.conf");
+	if (oper_file.good() == false) {
+		errorMsg("Could't open oper.conf file.");
+	} else {
+		std::string line;
+		int id_counter = 1;
+		size_t pos;
+		OperInfo oper_info;
+		while (std::getline(oper_file, line)) {
+			oper_info.id = id_counter;
+			if ((pos = line.find(' ')) == std::string::npos) {
+				std::string str = "Wrong data for operator " + intToString(id_counter);
+				errorMsg(str);
+				continue;
+			}
+			oper_info.name = line.substr(0, pos);
+			line.erase(0, pos + 1);
+			if ((pos = line.find(' ')) == std::string::npos) {
+				std::string str = "Wrong data for operator " + intToString(id_counter);
+				errorMsg(str);
+				continue;
+			}
+			oper_info.password = line.substr(0, pos);
+			line.erase(0, pos + 1);
+			if (line.empty() == true) {
+				std::string str = "Wrong data for operator " + intToString(id_counter);
+				errorMsg(str);
+				continue;
+			}
+			oper_info.host = line;
+			m_oper_info.push_back(oper_info);			
+			// std::cout << "name: " << oper_info.name << ", pass: " << oper_info.password << ", host: " << oper_info.host << std::endl;
+			id_counter++;
+		}
+	}
+
 	m_listening_socket = socket(AF_INET, SOCK_STREAM, 0);
 	if (m_listening_socket == -1) {
 		errorMsg("Cannot create socket.");
@@ -135,7 +174,7 @@ int Server::processUserMsg(User &user) {
 			executeCommand(user, msg_info);
 			// once server has nickname and username it tries to register user
 			if (!user.getNickname().empty() && !user.getUsername().empty()) {
-				if (user.getIsPassValid() && validateUsername(user.getUsername())) { // valid registration
+				if (user.getIsPassValid() && !user.getUsername().empty() && validateUsername(user.getUsername())) { // valid registration
 					user.setIsAuthorised(true);
 					std::string reply = registrationMessage(*this, user);
 					addRplAndPollout(user, reply);
@@ -164,15 +203,14 @@ int Server::executeCommand(User &user, MsgInfo &msg_info) {
 		privmsgCommand(user, msg_info);
 	} else if (msg_info.cmd == "JOIN") {
 		joinCommand(user, msg_info);
-	} 
-	else if (msg_info.cmd == "TOPIC") {
+	} else if (msg_info.cmd == "TOPIC") {
 		topicCommand(user, msg_info);
-	}
-	else if (msg_info.cmd == "PART") {
+	} else if (msg_info.cmd == "PART") {
 		partCommand(user, msg_info);
-	}
-	else if (msg_info.cmd == "NOTICE") {
+	} else if (msg_info.cmd == "NOTICE") {
 		noticeCommand(user, msg_info);
+	} else if (msg_info.cmd == "OPER") {
+		operCommand(user, msg_info);
 	}
 	// else if (msg_info.cmd == "INVITE") {
 	// 	inviteCommand(user, msg_info);
