@@ -15,8 +15,6 @@
 		PART #twilight_zone  -->  leave channel "#twilight_zone"
 */
 
-static void removeUserFromChannel(Server *server, std::string &channel_name, std::string &nickname);
-
 int Server::partCommand(User &user, MsgInfo msg_info) {
 	if (msg_info.params.empty()) {
 		// ERR_NEEDMOREPARAMS (461)
@@ -47,22 +45,4 @@ int Server::partCommand(User &user, MsgInfo msg_info) {
 	m_channels[channel_name].broadcastMsg(this, user.getNickname(), reply);
 	removeUserFromChannel(this, channel_name, user.getNickname());
 	return 0;
-}
-
-static void removeUserFromChannel(Server *server, std::string &channel_name, std::string &nickname) {
-	Channel &channel = server->getChannels()[channel_name];
-	std::vector<std::string>::iterator nickname_it = channel.getOperators().begin();
-	for (; nickname_it != channel.getOperators().end(); nickname_it++) {
-		if (*nickname_it == nickname) {
-			channel.getOperators().erase(nickname_it);
-			return;
-		}
-	}
-	nickname_it = channel.getUsers().begin();
-	for (; nickname_it != channel.getUsers().end(); nickname_it++) {
-		if (*nickname_it == nickname) {
-			channel.getUsers().erase(nickname_it);
-			return;
-		}
-	}
 }

@@ -213,9 +213,16 @@ int Server::executeCommand(User &user, MsgInfo &msg_info) {
 		operCommand(user, msg_info);
 	} else if (msg_info.cmd == "INVITE") {
 		inviteCommand(user, msg_info);
+	} else if (msg_info.cmd == "KICK") {
+		kickCommand(user, msg_info);
 	}
+	// else if (msg_info.cmd == "MODE") {
+	// 	modeCommand(user, msg_info);
+	// }
 	else {
-		// unknown command: ...
+		// ERR_UNKNOWNCOMMAND (421)
+		std::string reply = ERR_UNKNOWNCOMMAND(user.getNickname(), msg_info.cmd);
+		addRplAndPollout(user, reply);
 	}
 	return 0;
 }

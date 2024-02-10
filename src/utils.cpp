@@ -87,6 +87,24 @@ bool checkUserInvited(Server *server, std::string &channel_name, std::string &ni
 	return false;
 }
 
+void removeUserFromChannel(Server *server, std::string &channel_name, std::string &nickname) {
+	Channel &channel = server->getChannels()[channel_name];
+	std::vector<std::string>::iterator nickname_it = channel.getOperators().begin();
+	for (; nickname_it != channel.getOperators().end(); nickname_it++) {
+		if (*nickname_it == nickname) {
+			channel.getOperators().erase(nickname_it);
+			return;
+		}
+	}
+	nickname_it = channel.getUsers().begin();
+	for (; nickname_it != channel.getUsers().end(); nickname_it++) {
+		if (*nickname_it == nickname) {
+			channel.getUsers().erase(nickname_it);
+			return;
+		}
+	}
+}
+
 std::string formatTime(std::time_t raw) {
 	std::tm* time = std::localtime(&raw);
 	char buffer[80];

@@ -25,6 +25,8 @@ bool checkUserExist(Server *server, std::string &nickname);
 
 bool checkUserInvited(Server *server, std::string &channel_name, std::string &nickname);
 
+void removeUserFromChannel(Server *server, std::string &channel_name, std::string &nickname);
+
 std::string formatTime(std::time_t raw);
 
 std::string getTarget(std::string &params);

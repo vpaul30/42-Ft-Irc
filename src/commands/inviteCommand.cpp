@@ -13,8 +13,7 @@
 		ERR_NOTONCHANNEL (442)
 		ERR_CHANOPRIVSNEEDED (482)
 		ERR_USERONCHANNEL (443)
-
-		ERR_NOSUCHNICK (401)	--> manually added
+		ERR_NOSUCHNICK (401)
 
 	Command Example:
 		INVITE Wiz #foo_bar    ; Invite Wiz to #foo_bar

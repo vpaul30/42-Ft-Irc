@@ -85,6 +85,7 @@ class Server {
 		int topicCommand(User &user, MsgInfo &msg_info);
 		int operCommand(User &user, MsgInfo &msg_info);
 		int inviteCommand(User &user, MsgInfo &msg_info);
+		int kickCommand(User &user, MsgInfo &msg_info);
 		// int modeCommand(User &user, MsgInfo &msg_info);
 
 	private:

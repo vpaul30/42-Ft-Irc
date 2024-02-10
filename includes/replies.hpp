@@ -27,13 +27,15 @@
 
 #define ERR_NOOPERHOST(nickname) (":localhost 491 " + nickname + " :No operator for your host\r\n")
 
+#define ERR_UNKNOWNCOMMAND(nickname, cmd) (":localhost 421 " + nickname + " " + cmd + " :Unknown command\r\n")
+
 // === REPLIES ===
 
 #define RPL_WELCOME(nickname) (":localhost 001 " + nickname + " :Welcome to the 42 Internet Relay Chat Network " + nickname + ".\r\n")
 #define RPL_YOURHOST(nickname) (":localhost 002 " + nickname + " :Your host is FT_IRC, running version 1.0\r\n")
 #define RPL_CREATED(nickname, datetime) (":localhost 003 " + nickname + " :This server was created " + datetime + "\r\n")
 #define RPL_MYINFO(nickname) (":localhost 004 " + nickname + " FT_IRC 1.0 oiws itkol k\r\n")
-#define RPL_ISUPPORT(nickname) (":localhost 005 " + nickname + " MAXTARGETS=1 NICKLEN=12  :are supported by this server\r\n")
+#define RPL_ISUPPORT(nickname) (":localhost 005 " + nickname + " MAXTARGETS=1 NICKLEN=12 TARGMAX  :are supported by this server\r\n")
 
 #define RPL_NOTOPIC(nickname, channel) (":localhost 331 " + nickname + " " + channel + " :No topic is set\r\n")
 #define RPL_TOPIC(nickname, channel, topic) (":localhost 332 " + nickname + " " + channel + " " + topic + "\r\n")
@@ -49,3 +51,4 @@
 #define TOPIC(channel, topic) ("TOPIC " + channel + " " + topic + "\r\n") // should be sent with prefix
 #define PART(channel) ("PART " + channel + "\r\n") // should be sent with prefix
 #define INVITE(nickname, channel) ("INVITE " + nickname + " :" + channel + "\r\n") // should be sent with prefix
+#define KICK(channel, kick_nickname, comment) ("KICK " + channel + " " + kick_nickname + " :" + comment + "\r\n") // should be sent with prefix
