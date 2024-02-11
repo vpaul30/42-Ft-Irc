@@ -2,18 +2,21 @@
 
 Channel::Channel() {
 	m_channel_name = "";
-	m_password = "";
 	m_topic = "";
+	m_password = "";
 	m_invite_only = false;
 	m_users_limit = -1;
+	m_topic_restriction = true;
+
 }
 
 Channel::Channel(std::string &channel_name, std::string &nickname) : m_channel_name(channel_name) {
 	m_operators.push_back(nickname);
-	m_password = "";
 	m_topic = "";
+	m_password = "";
 	m_invite_only = false;
 	m_users_limit = -1;
+	m_topic_restriction = true;
 }
 
 std::string &Channel::getTopic() { return m_topic; }
@@ -40,6 +43,9 @@ void Channel::setInviteOnly(bool value) { m_invite_only = value; }
 
 int Channel::getUsersLimit() { return m_users_limit; }
 void Channel::setUsersLimit(int limit) { m_users_limit = limit; }
+
+bool Channel::getTopicRestriction() { return m_topic_restriction; }
+void Channel::setTopicRestriction(bool value) { m_topic_restriction = value; }
 
 void Channel::addNewUser(std::string &nickname) { m_users.push_back(nickname); }
 void Channel::addNewOperator(std::string &nickname) { m_operators.push_back(nickname); }

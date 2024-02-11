@@ -39,7 +39,9 @@ class Channel {
 		// m_users_limit
 		int getUsersLimit();
 		void setUsersLimit(int limit);
-
+		// m_topic_restriction
+		bool getTopicRestriction();
+		void setTopicRestriction(bool value);
 
 		void addNewUser(std::string &nickname);
 		void addNewOperator(std::string &nickname);
@@ -48,7 +50,6 @@ class Channel {
 
 	private:
 		std::string m_channel_name;
-		std::string m_password;
 		std::string m_topic;
 		std::string m_topicSetter;
 		std::time_t m_timeOfTopic;
@@ -57,6 +58,8 @@ class Channel {
 		std::vector<std::string> m_users;
 		std::vector<std::string> m_operators;
 		std::vector<std::string> m_invited_users;
+		std::string m_password;
 		bool m_invite_only;
+		bool m_topic_restriction;
 		int m_users_limit;
 };

@@ -21,7 +21,7 @@
 		:dan-!d@localhost INVITE Wiz #test    ; dan- has invited Wiz to the channel #test
 */
 
-static std::pair<std::string, std::string> paramSplit(std::string& params);
+// static std::pair<std::string, std::string> paramSplit(std::string& params);
 
 int Server::inviteCommand(User &user, MsgInfo &msg_info) {
 	std::pair<std::string, std::string> splitParams = paramSplit(msg_info.params);
@@ -82,13 +82,13 @@ int Server::inviteCommand(User &user, MsgInfo &msg_info) {
 	return 0;
 }
 
-static std::pair<std::string, std::string> paramSplit(std::string& params) {
-	size_t firstSpace = params.find(' ');
-	if (firstSpace != std::string::npos) {
-		std::string firstPart = params.substr(0, firstSpace);
-		std::string secondPart = params.substr(firstSpace + 1);
-		return std::make_pair(firstPart, secondPart);
-	} else {
-		return std::make_pair(params, "");
-	}
-}
+// static std::pair<std::string, std::string> paramSplit(std::string& params) {
+// 	size_t firstSpace = params.find(' ');
+// 	if (firstSpace != std::string::npos) {
+// 		std::string firstPart = params.substr(0, firstSpace);
+// 		std::string secondPart = params.substr(firstSpace + 1);
+// 		return std::make_pair(firstPart, secondPart);
+// 	} else {
+// 		return std::make_pair(params, "");
+// 	}
+// }

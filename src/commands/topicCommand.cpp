@@ -25,16 +25,16 @@
 
 // invite only channels?
 
-static std::pair<std::string, std::string> paramSplit(const std::string& params) {
-	size_t firstSpace = params.find(' ');
-	if (firstSpace != std::string::npos) {
-		std::string firstPart = params.substr(0, firstSpace);
-		std::string secondPart = params.substr(firstSpace + 1);
-		return std::make_pair(firstPart, secondPart);
-	} else {
-		return std::make_pair(params, "");
-	}
-}
+// static std::pair<std::string, std::string> paramSplit(const std::string& params) {
+// 	size_t firstSpace = params.find(' ');
+// 	if (firstSpace != std::string::npos) {
+// 		std::string firstPart = params.substr(0, firstSpace);
+// 		std::string secondPart = params.substr(firstSpace + 1);
+// 		return std::make_pair(firstPart, secondPart);
+// 	} else {
+// 		return std::make_pair(params, "");
+// 	}
+// }
 
 int Server::topicCommand(User &user, MsgInfo &msg_info) {
 	std::string reply;

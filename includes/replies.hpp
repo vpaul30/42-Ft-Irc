@@ -28,6 +28,8 @@
 #define ERR_NOOPERHOST(nickname) (":localhost 491 " + nickname + " :No operator for your host\r\n")
 
 #define ERR_UNKNOWNCOMMAND(nickname, cmd) (":localhost 421 " + nickname + " " + cmd + " :Unknown command\r\n")
+#define ERR_UNKNOWNMODE(nickname, mode) (":localhost 472 " + nickname + " " + mode + " :is an unknown mode to me\r\n")
+#define ERR_KEYSET(nickname, channel) (":localhost 467 " + nickname + " " + channel + " :Channel key already set\r\n")
 
 // === REPLIES ===
 
@@ -35,13 +37,15 @@
 #define RPL_YOURHOST(nickname) (":localhost 002 " + nickname + " :Your host is FT_IRC, running version 1.0\r\n")
 #define RPL_CREATED(nickname, datetime) (":localhost 003 " + nickname + " :This server was created " + datetime + "\r\n")
 #define RPL_MYINFO(nickname) (":localhost 004 " + nickname + " FT_IRC 1.0 oiws itkol k\r\n")
-#define RPL_ISUPPORT(nickname) (":localhost 005 " + nickname + " MAXTARGETS=1 NICKLEN=12 TARGMAX  :are supported by this server\r\n")
+#define RPL_ISUPPORT(nickname) (":localhost 005 " + nickname + " MODES=1 TARGMAX=PRIVMSG:1,NOTICE:1,JOIN:1,PART:1  :are supported by this server\r\n")
 
 #define RPL_NOTOPIC(nickname, channel) (":localhost 331 " + nickname + " " + channel + " :No topic is set\r\n")
 #define RPL_TOPIC(nickname, channel, topic) (":localhost 332 " + nickname + " " + channel + " " + topic + "\r\n")
 #define RPL_TOPICWHOTIME(nickname, channel, who, time) (":localhost 333 " + nickname + " " + channel + " " + who + " " + time + "\r\n")
 #define RPL_INVITING(nickname, who, channel) (":localhost 341 " + nickname + " " + who + " " + channel + "\r\n")
 #define RPL_YOUREOPER(nickname) (":localhost 381 " + nickname + " :You are now an operator of FT_IRC\r\n")
+#define RPL_CHANNELMODEIS(nickname, channel, mode) (":localhost 324 " + nickname + " " + channel + " " + mode + "\r\n")
+// :lead.libera.chat 324 pos1 #pos1 +Cinst
 
 #define NICK(old_nickname, username, hostname, new_nickname) ("changed nickname to " + new_nickname + "\r\n") // should be sent with prefix
 #define PRIVMSG(target, message) ("PRIVMSG " + target + " :" + message + "\r\n") // should be sent with prefix
@@ -52,3 +56,4 @@
 #define PART(channel) ("PART " + channel + "\r\n") // should be sent with prefix
 #define INVITE(nickname, channel) ("INVITE " + nickname + " :" + channel + "\r\n") // should be sent with prefix
 #define KICK(channel, kick_nickname, comment) ("KICK " + channel + " " + kick_nickname + " :" + comment + "\r\n") // should be sent with prefix
+#define MODE(channel, mode, param) ("MODE " + channel + " " + mode + " " + param + "\r\n") // should be sent with prefix

@@ -215,10 +215,9 @@ int Server::executeCommand(User &user, MsgInfo &msg_info) {
 		inviteCommand(user, msg_info);
 	} else if (msg_info.cmd == "KICK") {
 		kickCommand(user, msg_info);
+	} else if (msg_info.cmd == "MODE") {
+		modeCommand(user, msg_info);
 	}
-	// else if (msg_info.cmd == "MODE") {
-	// 	modeCommand(user, msg_info);
-	// }
 	else {
 		// ERR_UNKNOWNCOMMAND (421)
 		std::string reply = ERR_UNKNOWNCOMMAND(user.getNickname(), msg_info.cmd);

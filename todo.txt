@@ -11,3 +11,6 @@ noticeCommand.cpp | DONE
 operCommand.cpp | DONE
 fix USER with one word leads to successful registration | DONE
 joinCommand.cpp -> joinCommand(): finish mode checks (password, invite, user_limit)
+test if file transfer is working
+
+KICK multitarget?

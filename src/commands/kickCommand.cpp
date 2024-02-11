@@ -25,7 +25,7 @@
 		:WiZ!jto@tolsun.oulu.fi KICK #Finnish John        ; KICK message on channel #Finnish from WiZ to remove John from channel
 */
 
-static std::pair<std::string, std::string> paramSplit(const std::string& params);
+// static std::pair<std::string, std::string> paramSplit(const std::string& params);
 static std::vector<std::string> splitUsersList(const std::string& usersList, char delimiter);
 
 int Server::kickCommand(User &user, MsgInfo &msg_info) {
@@ -91,16 +91,16 @@ int Server::kickCommand(User &user, MsgInfo &msg_info) {
 	return 0;
 }
 
-static std::pair<std::string, std::string> paramSplit(const std::string& params) {
-	size_t firstSpace = params.find(' ');
-	if (firstSpace != std::string::npos) {
-		std::string firstPart = params.substr(0, firstSpace);
-		std::string secondPart = params.substr(firstSpace + 1);
-		return std::make_pair(firstPart, secondPart);
-	} else {
-		return std::make_pair(params, "");
-	}
-}
+// static std::pair<std::string, std::string> paramSplit(const std::string& params) {
+// 	size_t firstSpace = params.find(' ');
+// 	if (firstSpace != std::string::npos) {
+// 		std::string firstPart = params.substr(0, firstSpace);
+// 		std::string secondPart = params.substr(firstSpace + 1);
+// 		return std::make_pair(firstPart, secondPart);
+// 	} else {
+// 		return std::make_pair(params, "");
+// 	}
+// }
 
 static std::vector<std::string> splitUsersList(const std::string& usersList, char delimiter) {
 	std::vector<std::string> result;

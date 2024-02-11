@@ -105,6 +105,42 @@ void removeUserFromChannel(Server *server, std::string &channel_name, std::strin
 	}
 }
 
+void removeUserFromChannelUsers(Server *server, std::string &channel_name, std::string &nickname) {
+	Channel &channel = server->getChannels()[channel_name];
+	std::vector<std::string>::iterator nickname_it = channel.getUsers().begin();
+	for (; nickname_it != channel.getUsers().end(); nickname_it++) {
+		if (*nickname_it == nickname) {
+			channel.getUsers().erase(nickname_it);
+			return;
+		}
+	}
+}
+
+void removeUserFromChannelOperators(Server *server, std::string &channel_name, std::string &nickname) {
+	Channel &channel = server->getChannels()[channel_name];
+	std::vector<std::string>::iterator nickname_it = channel.getOperators().begin();
+	for (; nickname_it != channel.getOperators().end(); nickname_it++) {
+		if (*nickname_it == nickname) {
+			channel.getOperators().erase(nickname_it);
+			return;
+		}
+	}
+}
+
+std::pair<std::string, std::string> paramSplit(std::string params) {
+	size_t pos = params.find(' ');
+	if (pos != std::string::npos) {
+		std::string first_part = params.substr(0, pos);
+		params.erase(0, pos);
+		pos = params.find_first_not_of(' ');
+		params.erase(0, pos);
+		std::string second_part = params.substr(0);
+		return std::make_pair(first_part, second_part);
+	} else {
+		return std::make_pair(params, "");
+	}
+}
+
 std::string formatTime(std::time_t raw) {
 	std::tm* time = std::localtime(&raw);
 	char buffer[80];

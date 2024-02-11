@@ -27,6 +27,13 @@ bool checkUserInvited(Server *server, std::string &channel_name, std::string &ni
 
 void removeUserFromChannel(Server *server, std::string &channel_name, std::string &nickname);
 
+void removeUserFromChannelUsers(Server *server, std::string &channel_name, std::string &nickname);
+
+void removeUserFromChannelOperators(Server *server, std::string &channel_name, std::string &nickname);
+
+
+std::pair<std::string, std::string> paramSplit(std::string params);
+
 std::string formatTime(std::time_t raw);
 
 std::string getTarget(std::string &params);
