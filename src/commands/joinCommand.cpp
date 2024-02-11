@@ -61,14 +61,16 @@ int Server::joinCommand(User &user, MsgInfo &msg_info) {
 				addRplAndPollout(user, reply);
 				return 0;
 			}
-		} else if (channel_to_join.getInviteOnly() == true) {
+		}
+		if (channel_to_join.getInviteOnly() == true) {
 			if (checkUserInvited(this, channel_name, user.getNickname()) == false)
 			{
 				std::string reply = ERR_INVITEONLYCHAN(user.getNickname(), channel_name); // remove from invites when joins
 				addRplAndPollout(user, reply);
 				return 0;
 			}
-		} else if (channel_to_join.getUsersLimit() != -1) {
+		}
+		if (channel_to_join.getUsersLimit() != -1) {
 			if (channel_to_join.getUsers().size() + channel_to_join.getOperators().size() >= (size_t)channel_to_join.getUsersLimit()) {
 				std::string reply = ERR_CHANNELISFULL(user.getNickname(), channel_name);
 				addRplAndPollout(user, reply);
