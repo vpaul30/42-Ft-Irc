@@ -71,6 +71,21 @@ int Server::modeCommand(User &user, MsgInfo &msg_info)
 		addRplAndPollout(user, reply);
 		return 0;
 	}
+	Channel &channel = m_channels[channel_name];
+	if (mode_n_params.empty()) {
+		std::string channel_modes;
+		if (!channel.getPassword().empty())
+			channel_modes += 'k';
+		if (channel.getInviteOnly())
+			channel_modes += 'i';
+		if (channel.getTopicRestriction())
+			channel_modes += 't';
+		if (channel.getUsersLimit() > 0)
+			channel_modes += 'l';
+		std::string reply = RPL_CHANNELMODEIS(user.getNickname(), channel_name, channel_modes);
+		addRplAndPollout(user, reply);
+		return 0;
+	}
 	if (checkModeValid(mode) == false) {
 		// ERR_UNKNOWNMODE (472)
 		std::string reply = ERR_UNKNOWNMODE(user.getNickname(), mode);
@@ -86,10 +101,7 @@ int Server::modeCommand(User &user, MsgInfo &msg_info)
 
 	char mode_action = mode.size() == 1 ? '+' : mode[0];
 	char mode_char = mode.size() == 1 ? mode[0] : mode[1];
-	// std::cout << "mode_action = " << mode_action << std::endl;
-	// std::cout << "mode_char = " << mode_char << std::endl;
 
-    Channel &channel = m_channels[channel_name];
 	switch (mode_char) {
 	case 'i':
 		if (mode_action == '+') {
@@ -156,7 +168,7 @@ int Server::modeCommand(User &user, MsgInfo &msg_info)
 			std::string reply = prefix(user.getNickname(), user.getUsername(), user.getHostname());
 			reply += MODE(channel_name, mode_action + mode_char, mode_params);
 			addRplAndPollout(user, reply);
-			m_channels[channel_name].broadcastMsg(this, user.getNickname(), reply);
+			channel.broadcastMsg(this, user.getNickname(), reply);
 		}
 		else {
 			// bool isRemoved = channel.removeMode(mode[i]);
@@ -165,31 +177,61 @@ int Server::modeCommand(User &user, MsgInfo &msg_info)
 			std::string reply = prefix(user.getNickname(), user.getUsername(), user.getHostname());
 			reply += MODE(channel_name, mode_action + mode_char, mode_params);
 			addRplAndPollout(user, reply);
-			m_channels[channel_name].broadcastMsg(this, user.getNickname(), reply);
+			channel.broadcastMsg(this, user.getNickname(), reply);
 		}
 		break;
-	// case 'k':
-	// 	if (mode_params.empty()) {
-	// 		std::string reply = ERR_NEEDMOREPARAMS(user.getNickname(), msg_info.cmd);
-	// 		addRplAndPollout(user, reply);
-	// 		return 0;
-	// 	}
-	// 	if (!channel.getPassword().empty()) {
-	// 		std::string reply = ERR_KEYSET(user.getNickname(), channel.getChannelName());
-	// 		addRplAndPollout(user, reply);
-	// 		return 0;
-	// 	}
-	// 	if (mode[0] == '+') {
-	// 		// bool isAdded = channel.addMode(mode[i]);
-	// 		channel.setPassword(mode_params);
-	// 	}
-	// 	else {
-	// 		// bool isRemoved = channel.removeMode(mode[i]);
-	// 	}
-	// 	break;
-	// case 'l':
-
-	// 	break;
+	case 'k':
+		if (mode_params.empty()) {
+			std::string reply = ERR_NEEDMOREPARAMS(user.getNickname(), msg_info.cmd);
+			addRplAndPollout(user, reply);
+			return 0;
+		}
+		if (mode_action == '+') {
+			if (!channel.getPassword().empty()) {
+				std::string reply = ERR_KEYSET(user.getNickname(), channel.getChannelName());
+				addRplAndPollout(user, reply);
+				return 0;
+			}
+			std::string reply = prefix(user.getNickname(), user.getUsername(), user.getHostname());
+			reply += MODE(channel_name, mode_action + mode_char, mode_params);
+			addRplAndPollout(user, reply);
+			channel.broadcastMsg(this, user.getNickname(), reply);
+			channel.setPassword(mode_params);
+		} else {
+			if (mode_params != channel.getPassword())
+				return 0; // do nothing
+			std::string reply = prefix(user.getNickname(), user.getUsername(), user.getHostname());
+			reply += MODE(channel_name, mode_action + mode_char, mode_params);
+			addRplAndPollout(user, reply);
+			channel.broadcastMsg(this, user.getNickname(), reply);
+			std::string empty = "";
+			channel.setPassword(empty);
+		}
+		break;
+	case 'l':
+		if (mode_action == '+') {
+			if (mode_params.empty()) {
+				std::string reply = ERR_NEEDMOREPARAMS(user.getNickname(), msg_info.cmd);
+				addRplAndPollout(user, reply);
+				return 0;
+			}
+			int limit = std::stoi(mode_params);
+			if (limit < 0)
+				return 0; // do nothing
+			channel.setUsersLimit(limit);
+			std::string reply = prefix(user.getNickname(), user.getUsername(), user.getHostname());
+			reply += MODE(channel_name, mode_action + mode_char, mode_params);
+			addRplAndPollout(user, reply);
+			channel.broadcastMsg(this, user.getNickname(), reply);
+		}
+		else {
+			channel.setUsersLimit(-1);
+			std::string reply = prefix(user.getNickname(), user.getUsername(), user.getHostname());
+			reply += MODE(channel_name, mode_action + mode_char, "");
+			addRplAndPollout(user, reply);
+			channel.broadcastMsg(this, user.getNickname(), reply);
+		}
+		break;
 	default:
 		break;
 	}

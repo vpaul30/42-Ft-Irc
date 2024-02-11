@@ -30,6 +30,9 @@
 #define ERR_UNKNOWNCOMMAND(nickname, cmd) (":localhost 421 " + nickname + " " + cmd + " :Unknown command\r\n")
 #define ERR_UNKNOWNMODE(nickname, mode) (":localhost 472 " + nickname + " " + mode + " :is an unknown mode to me\r\n")
 #define ERR_KEYSET(nickname, channel) (":localhost 467 " + nickname + " " + channel + " :Channel key already set\r\n")
+#define ERR_BADCHANNELKEY(nickname, channel) (":localhost 475 " + nickname + " " + channel + " :Cannot join channel (+k)\r\n")
+#define ERR_INVITEONLYCHAN(nickname, channel) (":localhost 473 " + nickname + " " + channel + " :Cannot join channel (+i)\r\n")
+#define ERR_CHANNELISFULL(nickname, channel) (":localhost 471 " + nickname + " " + channel + " :Cannot join channel (+l)\r\n")
 
 // === REPLIES ===
 

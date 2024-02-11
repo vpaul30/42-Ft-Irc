@@ -23,19 +23,6 @@
 		TOPIC #test                     ; Checking the topic for "#test"
 */
 
-// invite only channels?
-
-// static std::pair<std::string, std::string> paramSplit(const std::string& params) {
-// 	size_t firstSpace = params.find(' ');
-// 	if (firstSpace != std::string::npos) {
-// 		std::string firstPart = params.substr(0, firstSpace);
-// 		std::string secondPart = params.substr(firstSpace + 1);
-// 		return std::make_pair(firstPart, secondPart);
-// 	} else {
-// 		return std::make_pair(params, "");
-// 	}
-// }
-
 int Server::topicCommand(User &user, MsgInfo &msg_info) {
 	std::string reply;
 	if (msg_info.params.empty()) {
@@ -55,14 +42,12 @@ int Server::topicCommand(User &user, MsgInfo &msg_info) {
 		addRplAndPollout(user, reply);
 		return 0;
 	}
-
 	if (checkUserInChannel(this, channelName, user.getNickname()) == false) {
 		// ERR_NOTONCHANNEL (442)
 		reply = ERR_NOTONCHANNEL(user.getNickname(), channelName);
 		addRplAndPollout(user, reply);
 		return 0;
 	}
-
 	Channel& channelObj = m_channels[channelName];
 	if (topic.empty()) {
 		if (channelObj.getTopic().empty()) {
@@ -80,7 +65,7 @@ int Server::topicCommand(User &user, MsgInfo &msg_info) {
 			return 0;
 		}
 	} else {
-		if (!checkUserChannelOperator(this, channelName, user.getNickname()) && !user.getIsOperator()) {
+		if (!checkUserChannelOperator(this, channelName, user.getNickname()) && !user.getIsOperator() && channelObj.getTopicRestriction()) {
 			// ERR_CHANOPRIVSNEEDED (482)
 			reply = ERR_CHANOPRIVSNEEDED(user.getNickname(), channelName);
 			addRplAndPollout(user, reply);
@@ -94,12 +79,6 @@ int Server::topicCommand(User &user, MsgInfo &msg_info) {
 		channelObj.broadcastMsg(this, user.getNickname(), reply);
 		// (332 and 333 are only sent to new user when he joins the channel)
 		
-		// RPL_TOPIC (332)
-		// reply = RPL_TOPIC(user.getNickname(), channelName, channelObj.getTopic());
-		// addRplAndPollout(user, reply);
-		// // RPL_TOPICWHOTIME (333)
-		// reply = RPL_TOPICWHOTIME(user.getNickname(), channelName, channelObj.getTopicSetter(), formatTime(channelObj.getTimeOfTopic()));
-		// addRplAndPollout(user, reply);
 	}
 	return 0;
 }
