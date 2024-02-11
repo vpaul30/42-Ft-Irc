@@ -22,9 +22,11 @@ void Server::chatbot(std::map<int, User>& users) {
 	messages.push_back("What's up?\r\n");
 	messages.push_back("Are you sleeping?\r\n");
 	messages.push_back("Please type something...\r\n");
-
+	std::string prefix = ":Bot3000!BOT@localhost ";
 	int randomMsgIndex = std::rand() % messages.size();
-	std::string& selectedMsg = messages[randomMsgIndex];
+
+	std::string& selectedMsg = prefix;
+	selectedMsg += messages[randomMsgIndex];
 
 	addRplAndPollout(selectedUser, selectedMsg);
 }

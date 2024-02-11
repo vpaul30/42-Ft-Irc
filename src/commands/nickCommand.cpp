@@ -67,7 +67,8 @@ static bool validateNickname(const std::string &nickname) {
 static bool isNicknameAvailable(Server *server, const std::string &nickname) {
 	std::map<int, User> &users = server->getUsers();
 	std::map<int, User>::iterator it = users.begin();
-
+	if (nickname == "Bot3000")
+		return false;
 	for (; it != users.end(); it++) {
 		if (it->second.getNickname() == nickname)
 			return false;
