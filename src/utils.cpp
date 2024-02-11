@@ -41,12 +41,12 @@ bool checkUserInChannel(Server *server, std::string &channel_name, std::string &
 	Channel &channel = channels[channel_name];
 
 	std::vector<std::string> &users = channel.getUsers();
-	for (int i = 0; i < users.size(); i++) {
+	for (size_t i = 0; i < users.size(); i++) {
 		if (users[i] == nickname)
 			return true;		
 	}
 	std::vector<std::string> &operators = channel.getOperators();
-	for (int i = 0; i < operators.size(); i++) {
+	for (size_t i = 0; i < operators.size(); i++) {
 		if (operators[i] == nickname)
 			return true;		
 	}
@@ -58,7 +58,7 @@ bool checkUserChannelOperator(Server *server, std::string &channel_name, std::st
 	Channel &channel = channels[channel_name];
 	
 	std::vector<std::string> &operators = channel.getOperators();
-	for (int i = 0; i < operators.size(); i++) {
+	for (size_t i = 0; i < operators.size(); i++) {
 		if (operators[i] == nickname)
 			return true;		
 	}
