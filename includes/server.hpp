@@ -68,6 +68,7 @@ class Server {
 		std::string &getTimeOfStart();
 		void removeUserFromChannels(std::string &nickname, std::string &reply);
 		void removeEmptyChannels();
+		void chatbot(std::map<int, User>& users);
 
 		User *getUserByNickname(std::string nickname);
 		std::map<std::string, Channel> &getChannels();
