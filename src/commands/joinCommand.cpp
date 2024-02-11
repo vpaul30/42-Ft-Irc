@@ -26,8 +26,6 @@
 		JOIN #channel1,#channel2
 */
 
-static void getChannelNames(std::vector<std::string> &channel_names, std::string &params);
-static void getChannelKeys(std::vector<std::string> &channel_keys, std::string &params);
 static bool isChannelNameValid(std::string &channel_name);
 static void removeUserFromInvited(Server *server, std::string &channel_name, std::string &nickname);
 
@@ -71,7 +69,7 @@ int Server::joinCommand(User &user, MsgInfo &msg_info) {
 				return 0;
 			}
 		} else if (channel_to_join.getUsersLimit() != -1) {
-			if (channel_to_join.getUsers().size() + channel_to_join.getOperators().size() >= channel_to_join.getUsersLimit()) {
+			if (channel_to_join.getUsers().size() + channel_to_join.getOperators().size() >= (size_t)channel_to_join.getUsersLimit()) {
 				std::string reply = ERR_CHANNELISFULL(user.getNickname(), channel_name);
 				addRplAndPollout(user, reply);
 				return 0;
