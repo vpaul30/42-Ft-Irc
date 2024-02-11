@@ -54,7 +54,7 @@ void Channel::addInvitedUser(std::string &nickname) { m_invited_users.push_back(
 
 // Broadcasts message to everyone except user_to_ignore
 void Channel::broadcastMsg(Server *server, std::string &nick_to_ignore, std::string &msg) {
-	int i;
+	size_t i;
 	for (i = 0; i < m_operators.size(); i++) {
 		User *user = server->getUserByNickname(m_operators[i]);
 		if (m_operators[i] == nick_to_ignore || user == NULL)

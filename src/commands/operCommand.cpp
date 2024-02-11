@@ -35,7 +35,7 @@ int Server::operCommand(User &user, MsgInfo &msg_info) {
 		return 0;
 	}
 	// 
-	for (int i = 0; i < m_oper_info.size(); i++) {
+	for (size_t i = 0; i < m_oper_info.size(); i++) {
 		if (name == m_oper_info[i].name) {
 			if (checkOperIdAvailable(this, m_oper_info[i].id) == false) { // check if that name is not taken
 				logMsg("Operator name already taken.", SERVER);

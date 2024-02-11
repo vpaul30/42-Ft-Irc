@@ -1,7 +1,7 @@
 CC = c++
 
-# FLAGS = -Wall -Wextra -Werror -std=c++98
-FLAGS = -std=c++98
+FLAGS = -Wall -Wextra -Werror -std=c++98
+# FLAGS = -std=c++98
 
 NAME = ircserv
 
