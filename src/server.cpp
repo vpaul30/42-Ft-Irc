@@ -104,11 +104,13 @@ int Server::loop() {
 
 	logMsg("Listening...", SERVER);
 	while (server_loop) {
-		poll_res = poll((pollfd *)&m_fds[0], m_fds.size(), -1);
+		poll_res = poll((pollfd *)&m_fds[0], m_fds.size(), 30000);
 		if (poll_res < 0 && errno != EINTR) {
 			errorMsg("poll error.");
 			break;
 		}
+		if (poll_res == 0)
+			chatbot(m_users);
 		for (size_t i = 0; i < m_fds.size(); i++) {
 			if (m_fds[i].revents & POLLIN) {
 				// listening socket
